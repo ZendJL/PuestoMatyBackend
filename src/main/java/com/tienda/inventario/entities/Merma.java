@@ -1,6 +1,6 @@
 package com.tienda.inventario.entities;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 
@@ -23,7 +23,7 @@ public class Merma {
     private String descripcion;
 
     @Column(name = "fecha_salida", nullable = false)
-    private Date fechaSalida;
+    private LocalDateTime fechaSalida;
 
     @Column(name = "cantidad", nullable = false)
     private Long cantidad;
@@ -32,7 +32,7 @@ public class Merma {
     }
 
     public Merma(Producto producto, String tipoMerma, String descripcion,
-                 Date fechaSalida, Long cantidad) {
+                 LocalDateTime fechaSalida, Long cantidad) {
         this.producto = producto;
         this.tipoMerma = tipoMerma;
         this.descripcion = descripcion;
@@ -72,11 +72,11 @@ public class Merma {
         this.descripcion = descripcion;
     }
 
-    public Date getFechaSalida() {
+    public LocalDateTime getFechaSalida() {
         return fechaSalida;
     }
 
-    public void setFechaSalida(Date fechaSalida) {
+    public void setFechaSalida(LocalDateTime fechaSalida) {
         this.fechaSalida = fechaSalida;
     }
 

@@ -1,6 +1,6 @@
 package com.tienda.inventario.entities;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 
@@ -13,7 +13,7 @@ public class Abono {
     private Long id;
 
     @Column(name = "fecha", nullable = false)
-    private Date fecha;
+    private LocalDateTime fecha;
 
     @ManyToOne
     @JoinColumn(name = "cuenta_id", nullable = false)
@@ -31,7 +31,7 @@ public class Abono {
     public Abono() {
     }
 
-    public Abono(Date fecha, CuentaCliente cuenta, Float cantidad,
+    public Abono(LocalDateTime fecha, CuentaCliente cuenta, Float cantidad,
                  Float viejoSaldo, Float nuevoSaldo) {
         this.fecha = fecha;
         this.cuenta = cuenta;
@@ -48,11 +48,11 @@ public class Abono {
         this.id = id;
     }
 
-    public Date getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 

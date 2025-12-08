@@ -1,6 +1,6 @@
 package com.tienda.inventario.controllers;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -57,8 +57,8 @@ public class AbonoController {
     @GetMapping("/cuenta/{cuentaId}/rango")
     public ResponseEntity<List<Abono>> abonosDeCuentaEntreFechas(
             @PathVariable Long cuentaId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date hasta) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta) {
         CuentaCliente cuenta = cuentaClienteService.buscarPorId(cuentaId);
         if (cuenta == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(abonoService.abonosDeCuentaEntreFechas(cuenta, desde, hasta));
@@ -66,8 +66,8 @@ public class AbonoController {
 
     @GetMapping("/rango")
     public List<Abono> abonosEntreFechas(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date hasta) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta) {
         return abonoService.abonosEntreFechas(desde, hasta);
     }
 }

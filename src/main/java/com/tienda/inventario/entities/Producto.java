@@ -1,6 +1,6 @@
 package com.tienda.inventario.entities;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -20,10 +20,10 @@ public class Producto {
     private Long cantidad;
 
     @Column(name = "ultima_compra")
-    private Date ultimaCompra;
+    private LocalDateTime ultimaCompra;
 
     @Column(name = "ultima_venta")
-    private Date ultimaVenta;
+    private LocalDateTime ultimaVenta;
 
     @OneToMany(mappedBy = "producto")
     private List<VentaProducto> ventaProductos;
@@ -35,7 +35,7 @@ public class Producto {
     }
 
     public Producto(Long id, String codigo, String descripcion, Float precio,
-                    String proveedor, Long cantidad, Date ultimaCompra, Date ultimaVenta) {
+            String proveedor, Long cantidad, LocalDateTime ultimaCompra, LocalDateTime ultimaVenta) {
         this.id = id;
         this.codigo = codigo;
         this.descripcion = descripcion;
@@ -94,19 +94,19 @@ public class Producto {
         this.cantidad = cantidad;
     }
 
-    public Date getUltimaCompra() {
+    public LocalDateTime getUltimaCompra() {
         return ultimaCompra;
     }
 
-    public void setUltimaCompra(Date ultimaCompra) {
+    public void setUltimaCompra(LocalDateTime ultimaCompra) {
         this.ultimaCompra = ultimaCompra;
     }
 
-    public Date getUltimaVenta() {
+    public LocalDateTime getUltimaVenta() {
         return ultimaVenta;
     }
 
-    public void setUltimaVenta(Date ultimaVenta) {
+    public void setUltimaVenta(LocalDateTime ultimaVenta) {
         this.ultimaVenta = ultimaVenta;
     }
 
@@ -126,5 +126,4 @@ public class Producto {
         this.mermas = mermas;
     }
 
-    
 }

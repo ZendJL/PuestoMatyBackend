@@ -1,6 +1,6 @@
 package com.tienda.inventario.services.impl;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    public List<Venta> ventasEntreFechas(Date desde, Date hasta) {
+    public List<Venta> ventasEntreFechas(LocalDateTime desde, LocalDateTime hasta) {
         return ventaRepository.findByFechaBetweenOrderByFechaAsc(desde, hasta);
     }
 

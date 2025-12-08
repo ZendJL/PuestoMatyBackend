@@ -1,6 +1,6 @@
 package com.tienda.inventario.repositories;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,8 +15,8 @@ public interface AbonoRepository extends JpaRepository<Abono, Long> {
 
     // Abonos por rango de fechas
     List<Abono> findByCuentaAndFechaBetweenOrderByFechaDesc(
-            CuentaCliente cuenta, Date desde, Date hasta);
+            CuentaCliente cuenta, LocalDateTime desde, LocalDateTime hasta);
 
     // Todos los abonos por rango de fechas
-    List<Abono> findByFechaBetweenOrderByFechaDesc(Date desde, Date hasta);
+    List<Abono> findByFechaBetweenOrderByFechaDesc(LocalDateTime desde, LocalDateTime hasta);
 }

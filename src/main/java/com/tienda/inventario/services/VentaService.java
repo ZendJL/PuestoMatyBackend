@@ -1,6 +1,6 @@
 package com.tienda.inventario.services;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.tienda.inventario.entities.Venta;
@@ -16,7 +16,7 @@ public interface VentaService {
 
     void eliminar(Long id);
 
-    List<Venta> ventasEntreFechas(Date desde, Date hasta);
+    List<Venta> ventasEntreFechas(LocalDateTime desde, LocalDateTime hasta);
 
     List<Venta> ventasPorStatus(String status);
 

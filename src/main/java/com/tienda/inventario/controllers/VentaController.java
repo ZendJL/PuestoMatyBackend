@@ -1,6 +1,6 @@
 package com.tienda.inventario.controllers;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -52,9 +52,9 @@ public class VentaController {
     }
 
     @GetMapping("/rango")
-    public List<Venta> ventasEntreFechas(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date hasta) {
+public List<Venta> ventasEntreFechas(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta) {
         return ventaService.ventasEntreFechas(desde, hasta);
     }
 

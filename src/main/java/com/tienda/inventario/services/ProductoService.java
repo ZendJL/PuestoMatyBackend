@@ -1,6 +1,6 @@
 package com.tienda.inventario.services;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.tienda.inventario.entities.Producto;
@@ -17,7 +17,7 @@ public interface ProductoService {
 
     List<Producto> productosConStock();
 
-    List<Producto> productosVendidosEnRango(Date desde, Date hasta);
+    List<Producto> productosVendidosEnRango(LocalDateTime desde, LocalDateTime hasta);
 
-    List<Producto> productosCompradosEnRango(Date desde, Date hasta);
+    List<Producto> productosCompradosEnRango(LocalDateTime desde, LocalDateTime hasta);
 }

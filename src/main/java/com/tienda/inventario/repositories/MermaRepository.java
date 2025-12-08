@@ -1,6 +1,6 @@
 package com.tienda.inventario.repositories;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,9 +18,9 @@ public interface MermaRepository extends JpaRepository<Merma, Long> {
 
     // Mermas por tipo y rango de fechas (para reportes diario/semanal/mensual)
     List<Merma> findByTipoMermaAndFechaSalidaBetweenOrderByFechaSalidaAsc(
-            String tipoMerma, Date desde, Date hasta);
+            String tipoMerma, LocalDateTime desde, LocalDateTime hasta);
 
     // Todas las mermas por rango de fechas
     List<Merma> findByFechaSalidaBetweenOrderByFechaSalidaAsc(
-            Date desde, Date hasta);
+            LocalDateTime desde, LocalDateTime hasta);
 }

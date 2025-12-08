@@ -1,6 +1,6 @@
 package com.tienda.inventario.services.impl;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -47,13 +47,13 @@ public class MermaServiceImpl implements MermaService {
     }
 
     @Override
-    public List<Merma> mermasPorTipoYRango(String tipoMerma, Date desde, Date hasta) {
+    public List<Merma> mermasPorTipoYRango(String tipoMerma, LocalDateTime desde, LocalDateTime hasta) {
         return mermaRepository
                 .findByTipoMermaAndFechaSalidaBetweenOrderByFechaSalidaAsc(tipoMerma, desde, hasta);
     }
 
     @Override
-    public List<Merma> mermasEntreFechas(Date desde, Date hasta) {
+    public List<Merma> mermasEntreFechas(LocalDateTime desde, LocalDateTime hasta) {
         return mermaRepository.findByFechaSalidaBetweenOrderByFechaSalidaAsc(desde, hasta);
     }
 }

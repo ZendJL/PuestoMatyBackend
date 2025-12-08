@@ -1,6 +1,6 @@
 package com.tienda.inventario.services;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.tienda.inventario.entities.Merma;
@@ -18,7 +18,7 @@ public interface MermaService {
 
     List<Merma> mermasDeProducto(Producto producto);
 
-    List<Merma> mermasPorTipoYRango(String tipoMerma, Date desde, Date hasta);
+    List<Merma> mermasPorTipoYRango(String tipoMerma, LocalDateTime desde, LocalDateTime hasta);
 
-    List<Merma> mermasEntreFechas(Date desde, Date hasta);
+    List<Merma> mermasEntreFechas(LocalDateTime desde, LocalDateTime hasta);
 }

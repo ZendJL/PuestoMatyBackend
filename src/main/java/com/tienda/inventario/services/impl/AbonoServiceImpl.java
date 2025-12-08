@@ -1,6 +1,6 @@
 package com.tienda.inventario.services.impl;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -47,12 +47,12 @@ public class AbonoServiceImpl implements AbonoService {
     }
 
     @Override
-    public List<Abono> abonosDeCuentaEntreFechas(CuentaCliente cuenta, Date desde, Date hasta) {
+    public List<Abono> abonosDeCuentaEntreFechas(CuentaCliente cuenta, LocalDateTime desde, LocalDateTime hasta) {
         return abonoRepository.findByCuentaAndFechaBetweenOrderByFechaDesc(cuenta, desde, hasta);
     }
 
     @Override
-    public List<Abono> abonosEntreFechas(Date desde, Date hasta) {
+    public List<Abono> abonosEntreFechas(LocalDateTime desde, LocalDateTime hasta) {
         return abonoRepository.findByFechaBetweenOrderByFechaDesc(desde, hasta);
     }
 }

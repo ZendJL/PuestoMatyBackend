@@ -1,6 +1,6 @@
 package com.tienda.inventario.entities;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -13,7 +13,7 @@ public class Venta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Date fecha;
+    private LocalDateTime fecha;
     private Long cuentaId; // si prefieres, puedes quitar esto y usar solo VentaCliente
 
     private Float total;
@@ -28,7 +28,7 @@ public class Venta {
     public Venta() {
     }
 
-    public Venta(Long id, Date fecha, Long cuentaId, Float total, String status) {
+    public Venta(Long id, LocalDateTime fecha, Long cuentaId, Float total, String status) {
         this.id = id;
         this.fecha = fecha;
         this.cuentaId = cuentaId;
@@ -44,11 +44,11 @@ public class Venta {
         this.id = id;
     }
 
-    public Date getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 

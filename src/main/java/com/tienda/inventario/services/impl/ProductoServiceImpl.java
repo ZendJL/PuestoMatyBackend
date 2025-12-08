@@ -1,6 +1,6 @@
 package com.tienda.inventario.services.impl;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -46,12 +46,12 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public List<Producto> productosVendidosEnRango(Date desde, Date hasta) {
+    public List<Producto> productosVendidosEnRango(LocalDateTime desde, LocalDateTime hasta) {
         return productoRepository.findByUltimaVentaBetween(desde, hasta);
     }
 
     @Override
-    public List<Producto> productosCompradosEnRango(Date desde, Date hasta) {
+    public List<Producto> productosCompradosEnRango(LocalDateTime desde, LocalDateTime hasta) {
         return productoRepository.findByUltimaCompraBetween(desde, hasta);
     }
 }

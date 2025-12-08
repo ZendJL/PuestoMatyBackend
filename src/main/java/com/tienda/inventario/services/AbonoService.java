@@ -1,6 +1,6 @@
 package com.tienda.inventario.services;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.tienda.inventario.entities.Abono;
@@ -18,7 +18,7 @@ public interface AbonoService {
 
     List<Abono> abonosDeCuenta(CuentaCliente cuenta);
 
-    List<Abono> abonosDeCuentaEntreFechas(CuentaCliente cuenta, Date desde, Date hasta);
+    List<Abono> abonosDeCuentaEntreFechas(CuentaCliente cuenta, LocalDateTime desde, LocalDateTime hasta);
 
-    List<Abono> abonosEntreFechas(Date desde, Date hasta);
+    List<Abono> abonosEntreFechas(LocalDateTime desde, LocalDateTime hasta);
 }
