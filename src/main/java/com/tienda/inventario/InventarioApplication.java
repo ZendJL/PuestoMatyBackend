@@ -7,8 +7,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.tienda.inventario.Repositories.ProductoRepository;
 import com.tienda.inventario.entities.Producto;
+import com.tienda.inventario.repositories.ProductoRepository;
 
 @SpringBootApplication
 public class InventarioApplication implements CommandLineRunner {
