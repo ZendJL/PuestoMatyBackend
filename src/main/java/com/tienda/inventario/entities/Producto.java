@@ -4,36 +4,42 @@ package com.tienda.inventario.entities;
 import java.util.Date;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name="productos")
 public class Producto {
-
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String codigo;
     private String descripcion;
     private Float precio;
     private String proveedor;
     private Long cantidad;
-    private Date ultima_compra;
-    private Date ultima_venta;
+    private Date ultimaCompra;
+    private Date ultimaVenta;
     
     public Producto() {
     }
-
-    public Producto(Long id, String codigo, String descripcion, Float precio, String proveedor, Long cantidad,
-            Date ultima_compra, Date ultima_venta) {
-        this.id = id;
-        this.codigo = codigo;
-        this.descripcion = descripcion;
-        this.precio = precio;
-        this.proveedor = proveedor;
-        this.cantidad = cantidad;
-        this.ultima_compra = ultima_compra;
-        this.ultima_venta = ultima_venta;
-    }
     
+    public Producto(Long id, String codigo, String descripcion, Float precio, String proveedor, Long cantidad,
+        Date ultimaCompra, Date ultimaVenta) {
+            this.id = id;
+            this.codigo = codigo;
+            this.descripcion = descripcion;
+            this.precio = precio;
+            this.proveedor = proveedor;
+            this.cantidad = cantidad;
+            this.ultimaCompra = ultimaCompra;
+            this.ultimaVenta = ultimaVenta;
+    }
+        
     public Long getId() {
         return id;
     }
@@ -70,17 +76,24 @@ public class Producto {
     public void setCantidad(Long cantidad) {
         this.cantidad = cantidad;
     }
-    public Date getUltima_compra() {
-        return ultima_compra;
+    public Date getUltimaCompra() {
+        return ultimaCompra;
     }
-    public void setUltima_compra(Date ultima_compra) {
-        this.ultima_compra = ultima_compra;
+    public void setUltima_compra(Date ultimaCompra) {
+        this.ultimaCompra = ultimaCompra;
     }
-    public Date getUltima_venta() {
-        return ultima_venta;
+    public Date getUltimaVenta() {
+        return ultimaVenta;
     }
-    public void setUltima_venta(Date ultima_venta) {
-        this.ultima_venta = ultima_venta;
+    public void setUltimaVenta(Date ultimaVenta) {
+        this.ultimaVenta = ultimaVenta;
+    }
+    
+    @Override
+    public String toString() {
+        return "Producto [id=" + id + ", codigo=" + codigo + ", descripcion=" + descripcion + ", precio=" + precio
+                + ", proveedor=" + proveedor + ", cantidad=" + cantidad + ", ultimaCompra=" + ultimaCompra
+                + ", ultimaVenta=" + ultimaVenta + "]";
     }
     
 }
