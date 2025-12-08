@@ -25,7 +25,7 @@ public class InventarioApplication implements CommandLineRunner {
 		List<Producto> productos = (List<Producto>) repository.findAll();
 
 		productos.stream().forEach(producto -> {
-			System.out.println(producto.toString());
+			System.out.println(producto);
 		});
 	}
 }
