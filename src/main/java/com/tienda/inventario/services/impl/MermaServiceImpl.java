@@ -28,6 +28,7 @@ public class MermaServiceImpl implements MermaService {
     @Override
     @Transactional
     public Merma guardar(Merma merma) {
+        merma.setFechaSalida(LocalDateTime.now());
         if (merma.getMermaProductos() != null) {
             for (MermaProducto mp : merma.getMermaProductos()) {
                 mp.setMerma(merma);

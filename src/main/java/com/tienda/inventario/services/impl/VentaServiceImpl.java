@@ -37,6 +37,7 @@ public class VentaServiceImpl implements VentaService {
 
     @Override
     public Venta guardar(Venta venta) {
+        venta.setFecha(LocalDateTime.now());
         return ventaRepository.save(venta);
     }
 
@@ -74,7 +75,7 @@ public class VentaServiceImpl implements VentaService {
 @Override
 @Transactional
 public Venta crearVentaConProductos(Venta venta) {
-
+    venta.setFecha(LocalDateTime.now());
     // Resolver cuenta (ya lo tienes)
     if (venta.getCuenta() == null && venta.getCuentaId() != null) {
         CuentaCliente cuenta = cuentaClienteService.buscarPorId(venta.getCuentaId());

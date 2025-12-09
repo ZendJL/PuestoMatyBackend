@@ -23,6 +23,7 @@ public class AbonoServiceImpl implements AbonoService {
 
     @Override
     public Abono guardar(Abono abono) {
+        abono.setFecha(LocalDateTime.now());
         return abonoRepository.save(abono);
     }
 

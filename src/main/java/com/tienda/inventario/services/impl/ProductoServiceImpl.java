@@ -27,6 +27,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public Producto guardar(Producto producto) {
+        producto.setUltimaCompra(LocalDateTime.now());
         return productoRepository.save(producto);
     }
 
