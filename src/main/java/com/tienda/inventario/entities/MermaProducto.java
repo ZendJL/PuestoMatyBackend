@@ -15,21 +15,21 @@ import jakarta.persistence.Table;
 @Table(name = "merma_productos")
 public class MermaProducto {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @ManyToOne
-  @JoinColumn(name = "merma_id", nullable = false)
-@JsonIgnore
-  private Merma merma;
+    @ManyToOne
+    @JoinColumn(name = "merma_id")
+    @JsonIgnore  
+    private Merma merma;
 
-  @ManyToOne
-  @JoinColumn(name = "producto_id", nullable = false)
-  private Producto producto;
+    @ManyToOne
+    @JoinColumn(name = "producto_id", nullable = false)
+    private Producto producto;
 
-  @Column(nullable = false)
-  private Integer cantidad;
+    @Column(nullable = false)
+    private Integer cantidad;
 
     public MermaProducto() {
     }
@@ -72,5 +72,4 @@ public class MermaProducto {
         this.cantidad = cantidad;
     }
 
-    
 }

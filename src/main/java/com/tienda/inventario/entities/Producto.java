@@ -31,22 +31,24 @@ public class Producto {
     @Column(name = "ultima_compra")
     private LocalDateTime ultimaCompra;
 
-    @Column(name = "ultima_venta")
-    private LocalDateTime ultimaVenta;
+    @Column(name = "activo")
+    private Boolean activo;
+
+      @JsonIgnore
+    @OneToMany(mappedBy = "producto")
+    private List<VentaProducto> ventaProductos = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "producto")
-    private List<VentaProducto> ventaProductos;
+    private List<MermaProducto> mermaProductos = new ArrayList<>();
 
-    @OneToMany(mappedBy = "producto")
-private List<MermaProducto> mermaProductos = new ArrayList<>();
 
 
     public Producto() {
     }
 
     public Producto(Long id, String codigo, String descripcion, Float precio,
-            String proveedor, Long cantidad, LocalDateTime ultimaCompra, LocalDateTime ultimaVenta) {
+            String proveedor, Long cantidad, LocalDateTime ultimaCompra, Boolean activo) {
         this.id = id;
         this.codigo = codigo;
         this.descripcion = descripcion;
@@ -54,7 +56,7 @@ private List<MermaProducto> mermaProductos = new ArrayList<>();
         this.proveedor = proveedor;
         this.cantidad = cantidad;
         this.ultimaCompra = ultimaCompra;
-        this.ultimaVenta = ultimaVenta;
+        this.activo = activo;
     }
 
     public Long getId() {
@@ -113,12 +115,12 @@ private List<MermaProducto> mermaProductos = new ArrayList<>();
         this.ultimaCompra = ultimaCompra;
     }
 
-    public LocalDateTime getUltimaVenta() {
-        return ultimaVenta;
+    public Boolean getActivo() {
+        return activo;
     }
 
-    public void setUltimaVenta(LocalDateTime ultimaVenta) {
-        this.ultimaVenta = ultimaVenta;
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public List<VentaProducto> getVentaProductos() {
@@ -129,5 +131,13 @@ private List<MermaProducto> mermaProductos = new ArrayList<>();
         this.ventaProductos = ventaProductos;
     }
 
+    public List<MermaProducto> getMermaProductos() {
+        return mermaProductos;
+    }
+
+    public void setMermaProductos(List<MermaProducto> mermaProductos) {
+        this.mermaProductos = mermaProductos;
+    }
+    
 
 }

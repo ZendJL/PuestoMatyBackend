@@ -72,7 +72,7 @@ public ResponseEntity<Merma> crear(@RequestBody Merma merma) {
 
         producto.setCantidad(nuevoStock);
         producto.setUltimaCompra(producto.getUltimaCompra()); // no tocar
-        producto.setUltimaVenta(null); // opcional, normalmente no cambia aquí
+        producto.setActivo(producto.getActivo()); // opcional, normalmente no cambia aquí
 
         productoService.guardar(producto);
     });

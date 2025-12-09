@@ -15,9 +15,9 @@ public interface ProductoService {
 
     void eliminar(Long id);
 
-    List<Producto> productosConStock();
+    List<Producto> findByActivoTrue();
 
-    List<Producto> productosVendidosEnRango(LocalDateTime desde, LocalDateTime hasta);
+    List<Producto> productosConStock();
 
     List<Producto> productosCompradosEnRango(LocalDateTime desde, LocalDateTime hasta);
 }

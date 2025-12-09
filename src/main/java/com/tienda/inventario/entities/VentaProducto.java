@@ -22,7 +22,6 @@ public class VentaProducto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    
     @ManyToOne
     @JoinColumn(name = "venta_id", nullable = false)
     @JsonIgnore
@@ -30,7 +29,8 @@ public class VentaProducto {
 
     @JsonProperty("venta")
     public Map<String, Object> getVentaResumen() {
-        if (venta == null) return null;
+        if (venta == null)
+            return null;
         Map<String, Object> m = new HashMap<>();
         m.put("id", venta.getId());
         m.put("fecha", venta.getFecha()); // LocalDateTime se serializa a ISO
@@ -48,7 +48,7 @@ public class VentaProducto {
     }
 
     public VentaProducto(Venta venta, Producto producto,
-                         Integer cantidad, Float precioUnitario) {
+            Integer cantidad, Float precioUnitario) {
         this.venta = venta;
         this.producto = producto;
         this.cantidad = cantidad;
@@ -95,5 +95,4 @@ public class VentaProducto {
         this.precioUnitario = precioUnitario;
     }
 
-    
 }

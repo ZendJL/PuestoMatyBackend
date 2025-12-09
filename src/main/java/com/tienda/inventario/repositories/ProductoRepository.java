@@ -14,12 +14,10 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     // Productos con stock > 0
     List<Producto> findByCantidadGreaterThan(Long cantidad);
 
-    // Productos por rango de fecha de última venta
-    List<Producto> findByUltimaVentaBetween(LocalDateTime desde, LocalDateTime hasta);
-
     // Productos por rango de fecha de última compra
     List<Producto> findByUltimaCompraBetween(LocalDateTime desde, LocalDateTime hasta);
 
+    List<Producto> findByActivoTrue();
 
     // Precio del producto por id
 @Query("select p.precio from Producto p where p.id = :id")

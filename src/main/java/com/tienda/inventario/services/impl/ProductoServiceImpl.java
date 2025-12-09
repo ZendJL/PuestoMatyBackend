@@ -45,13 +45,15 @@ public class ProductoServiceImpl implements ProductoService {
         return productoRepository.findByCantidadGreaterThan(0L);
     }
 
-    @Override
-    public List<Producto> productosVendidosEnRango(LocalDateTime desde, LocalDateTime hasta) {
-        return productoRepository.findByUltimaVentaBetween(desde, hasta);
-    }
 
     @Override
     public List<Producto> productosCompradosEnRango(LocalDateTime desde, LocalDateTime hasta) {
         return productoRepository.findByUltimaCompraBetween(desde, hasta);
     }
+
+    @Override
+    public List<Producto> findByActivoTrue() {
+        return productoRepository.findByActivoTrue();
+    }
+
 }

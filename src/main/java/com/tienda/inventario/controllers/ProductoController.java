@@ -33,30 +33,35 @@ public class ProductoController {
         return productoService.listarTodos();
     }
 
+    // productos activos para vender
+    @GetMapping("/activos")
+    public List<Producto> listarActivos() {
+        return productoService.findByActivoTrue(); // usa findByActivoTrue()
+    }
+
     // ProductoController.java
-@PostMapping("/{id}/agregar-stock")
-public ResponseEntity<Producto> agregarStock(
-        @PathVariable Long id,
-        @RequestParam("cantidad") Integer cantidadAgregar) {
+    @PostMapping("/{id}/agregar-stock")
+    public ResponseEntity<Producto> agregarStock(
+            @PathVariable Long id,
+            @RequestParam("cantidad") Integer cantidadAgregar) {
 
-    if (cantidadAgregar == null || cantidadAgregar <= 0) {
-        return ResponseEntity.badRequest().build();
+        if (cantidadAgregar == null || cantidadAgregar <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Producto producto = productoService.buscarPorId(id);
+        if (producto == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Long nuevoStock = (producto.getCantidad() == null ? 0 : producto.getCantidad())
+                + cantidadAgregar;
+        producto.setCantidad(nuevoStock);
+        producto.setUltimaCompra(LocalDateTime.now());
+
+        Producto guardado = productoService.guardar(producto);
+        return ResponseEntity.ok(guardado);
     }
-
-    Producto producto = productoService.buscarPorId(id);
-    if (producto == null) {
-        return ResponseEntity.notFound().build();
-    }
-
-    Long nuevoStock = (producto.getCantidad() == null ? 0 : producto.getCantidad())
-        + cantidadAgregar;
-    producto.setCantidad(nuevoStock);
-    producto.setUltimaCompra(LocalDateTime.now());
-
-    Producto guardado = productoService.guardar(producto);
-    return ResponseEntity.ok(guardado);
-}
-
 
     @GetMapping("/{id}")
     public ResponseEntity<Producto> obtenerPorId(@PathVariable Long id) {
@@ -65,19 +70,26 @@ public ResponseEntity<Producto> agregarStock(
     }
 
     @PostMapping
-    public ResponseEntity<Producto> crear(@RequestBody Producto producto) {
-        Producto guardado = productoService.guardar(producto);
-        return ResponseEntity.ok(guardado);
+    public ResponseEntity<Producto> crear(@RequestBody Producto p) {
+        if (p.getActivo() == null) {
+            p.setActivo(true); // por defecto activo
+        }
+        return ResponseEntity.ok(productoService.guardar(p));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizar(@PathVariable Long id, @RequestBody Producto producto) {
+    public ResponseEntity<Producto> actualizar(@PathVariable Long id, @RequestBody Producto p) {
         Producto existente = productoService.buscarPorId(id);
-        if (existente == null) {
+        if (existente == null)
             return ResponseEntity.notFound().build();
-        }
-        producto.setId(id);
-        return ResponseEntity.ok(productoService.guardar(producto));
+
+        existente.setDescripcion(p.getDescripcion());
+        existente.setPrecio(p.getPrecio());
+        existente.setProveedor(p.getProveedor());
+        existente.setCantidad(p.getCantidad());
+        existente.setActivo(p.getActivo()); // aquí se habilita / deshabilita
+
+        return ResponseEntity.ok(productoService.guardar(existente));
     }
 
     @DeleteMapping("/{id}")
@@ -92,13 +104,6 @@ public ResponseEntity<Producto> agregarStock(
     }
 
     @GetMapping("/ventas")
-    public List<Producto> productosVendidosEnRango(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta) {
-        return productoService.productosVendidosEnRango(desde, hasta);
-    }
-
-    @GetMapping("/compras")
     public List<Producto> productosCompradosEnRango(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta) {
