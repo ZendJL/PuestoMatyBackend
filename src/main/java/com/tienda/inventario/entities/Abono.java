@@ -2,7 +2,14 @@ package com.tienda.inventario.entities;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "abonos")
@@ -17,6 +24,7 @@ public class Abono {
 
     @ManyToOne
     @JoinColumn(name = "cuenta_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private CuentaCliente cuenta;
 
     @Column(name = "cantidad", nullable = false)
@@ -27,6 +35,11 @@ public class Abono {
 
     @Column(name = "nuevo_saldo", nullable = false)
     private Float nuevoSaldo;
+
+    @com.fasterxml.jackson.annotation.JsonProperty("cuentaId")
+    public Long getCuentaId() {
+        return cuenta != null ? cuenta.getId() : null;
+    }
 
     public Abono() {
     }

@@ -72,31 +72,53 @@ public class VentaServiceImpl implements VentaService {
 
     // VentaServiceImpl
 @Override
+@Transactional
 public Venta crearVentaConProductos(Venta venta) {
 
+    // Resolver cuenta (ya lo tienes)
     if (venta.getCuenta() == null && venta.getCuentaId() != null) {
         CuentaCliente cuenta = cuentaClienteService.buscarPorId(venta.getCuentaId());
         venta.setCuenta(cuenta);
     }
 
-    // Asociar la venta a cada detalle y resolver el Producto real
     if (venta.getVentaProductos() != null) {
         for (VentaProducto vp : venta.getVentaProductos()) {
+
             Long prodId = vp.getProducto().getId();
             Producto producto = productoRepository.findById(prodId)
                     .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + prodId));
+
+            // Enlazar relaciones
             vp.setVenta(venta);
             vp.setProducto(producto);
 
-            // Si no mandas precioUnitario desde el front, puedes rellenarlo aquí:
+            // Si no viene precioUnitario, tomar el actual
             if (vp.getPrecioUnitario() == null) {
                 vp.setPrecioUnitario(producto.getPrecio());
             }
+
+            // 1) Restar stock
+            Long stockActual = producto.getCantidad();
+            Long nuevaCantidad = stockActual - vp.getCantidad();
+            if (nuevaCantidad < 0) {
+                throw new IllegalArgumentException("Stock insuficiente para el producto " + producto.getDescripcion());
+            }
+            producto.setCantidad(nuevaCantidad);
+            productoRepository.save(producto);
         }
     }
 
-    // gracias a cascade=ALL, al guardar la venta se guardan también los VentaProducto
+    // 2) Actualizar saldo si es PRESTAMO
+    if ("PRESTAMO".equalsIgnoreCase(venta.getStatus()) && venta.getCuenta() != null) {
+        CuentaCliente cuenta = venta.getCuenta();
+        Float saldoActual = cuenta.getSaldo() == null ? 0f : cuenta.getSaldo();
+        cuenta.setSaldo(saldoActual + venta.getTotal());
+        // si tienes CuentaClienteRepository o service, persístelo
+        cuentaClienteService.guardar(cuenta);
+    }
+
     return ventaRepository.save(venta);
 }
+
 
 }
