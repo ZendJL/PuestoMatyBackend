@@ -32,9 +32,11 @@ public class VentaController {
         return v != null ? ResponseEntity.ok(v) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping
+       @PostMapping
     public ResponseEntity<Venta> crear(@RequestBody Venta venta) {
-        return ResponseEntity.ok(ventaService.guardar(venta));
+        // Aquí la venta ya debe traer la lista de VentaProducto con los productos referenciados
+        Venta guardada = ventaService.guardar(venta);
+        return ResponseEntity.ok(guardada);
     }
 
     @PutMapping("/{id}")
@@ -69,4 +71,6 @@ public List<Venta> ventasEntreFechas(
         if (v == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(ventaService.productosDeVenta(v));
     }
+
+    
 }

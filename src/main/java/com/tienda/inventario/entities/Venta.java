@@ -3,6 +3,8 @@ package com.tienda.inventario.entities;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -18,12 +20,13 @@ public class Venta {
 
     private Float total;
     private String status;
-
-    @OneToMany(mappedBy = "venta")
-    private List<VentaProducto> ventaProductos;
-
     @OneToMany(mappedBy = "venta")
     private List<VentaCliente> ventasCliente;
+
+    
+@OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+@JsonManagedReference
+private List<VentaProducto> ventaProductos;
 
     public Venta() {
     }
@@ -76,20 +79,20 @@ public class Venta {
         this.status = status;
     }
 
-    public List<VentaProducto> getVentaProductos() {
-        return ventaProductos;
-    }
-
-    public void setVentaProductos(List<VentaProducto> ventaProductos) {
-        this.ventaProductos = ventaProductos;
-    }
-
     public List<VentaCliente> getVentasCliente() {
         return ventasCliente;
     }
 
     public void setVentasCliente(List<VentaCliente> ventasCliente) {
         this.ventasCliente = ventasCliente;
+    }
+
+    public List<VentaProducto> getVentaProductos() {
+    return ventaProductos;
+}
+
+    public void setVentaProductos(List<VentaProducto> ventaProductos) {
+        this.ventaProductos = ventaProductos;
     }
 
     

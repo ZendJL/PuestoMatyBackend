@@ -3,6 +3,8 @@ package com.tienda.inventario.entities;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -25,9 +27,11 @@ public class Producto {
     @Column(name = "ultima_venta")
     private LocalDateTime ultimaVenta;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "producto")
     private List<VentaProducto> ventaProductos;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "producto")
     private List<Merma> mermas;
 
