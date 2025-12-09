@@ -44,9 +44,42 @@ public class MermaController {
 
     @PostMapping
 public ResponseEntity<Merma> crear(@RequestBody Merma merma) {
-    Merma guardada = mermaService.guardar(merma);
-    return ResponseEntity.ok(guardada);
-}
+    // Asegurar fecha si viene nula
+    if (merma.getFechaSalida() == null) {
+        merma.setFechaSalida(LocalDateTime.now());
+    }
+
+    // Validar que haya productos en la merma
+    if (merma.getMermaProductos() == null || merma.getMermaProductos().isEmpty()) {
+        return ResponseEntity.badRequest().build();
+    }
+
+    // Actualizar stock de cada producto
+        merma.getMermaProductos().forEach(mp -> {
+        Long productoId = mp.getProducto().getId();
+        Integer cantMerma = mp.getCantidad();
+
+        var producto = productoService.buscarPorId(productoId);
+        if (producto == null) {
+            throw new IllegalArgumentException("Producto no encontrado: " + productoId);
+        }
+
+        long stockActual = producto.getCantidad() == null ? 0 : producto.getCantidad();
+        long nuevoStock = stockActual - cantMerma;
+        if (nuevoStock < 0) {
+            nuevoStock = 0; // o lanza excepción si no quieres permitirlo
+        }
+
+        producto.setCantidad(nuevoStock);
+        producto.setUltimaCompra(producto.getUltimaCompra()); // no tocar
+        producto.setUltimaVenta(null); // opcional, normalmente no cambia aquí
+
+        productoService.guardar(producto);
+    });
+        // Guardar la merma con sus detalles
+        Merma guardada = mermaService.guardar(merma);
+        return ResponseEntity.ok(guardada);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {

@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class InventarioApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(InventarioApplication.class, args);
+		java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("America/Tijuana"));
+        SpringApplication.run(InventarioApplication.class, args);
 	}
 }
