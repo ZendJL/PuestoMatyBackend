@@ -1,8 +1,17 @@
 package com.tienda.inventario.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "merma")
@@ -11,10 +20,6 @@ public class Merma {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "producto_id", nullable = false)
-    private Producto producto;
 
     @Column(name = "tipo_merma", nullable = false, length = 25)
     private String tipoMerma; // EXPIRADO, USO_PERSONAL, MAL_ESTADO, etc.
@@ -25,19 +30,18 @@ public class Merma {
     @Column(name = "fecha_salida", nullable = false)
     private LocalDateTime fechaSalida;
 
-    @Column(name = "cantidad", nullable = false)
-    private Long cantidad;
+    @OneToMany(mappedBy = "merma", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MermaProducto> mermaProductos = new ArrayList<>();
 
+    
     public Merma() {
     }
 
     public Merma(Producto producto, String tipoMerma, String descripcion,
                  LocalDateTime fechaSalida, Long cantidad) {
-        this.producto = producto;
         this.tipoMerma = tipoMerma;
         this.descripcion = descripcion;
         this.fechaSalida = fechaSalida;
-        this.cantidad = cantidad;
     }
 
     public Long getId() {
@@ -46,14 +50,6 @@ public class Merma {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Producto getProducto() {
-        return producto;
-    }
-
-    public void setProducto(Producto producto) {
-        this.producto = producto;
     }
 
     public String getTipoMerma() {
@@ -80,13 +76,15 @@ public class Merma {
         this.fechaSalida = fechaSalida;
     }
 
-    public Long getCantidad() {
-        return cantidad;
+    public List<MermaProducto> getMermaProductos() {
+        return mermaProductos;
     }
 
-    public void setCantidad(Long cantidad) {
-        this.cantidad = cantidad;
+    public void setMermaProductos(List<MermaProducto> mermaProductos) {
+        this.mermaProductos = mermaProductos;
     }
+
+    
 
     
 }

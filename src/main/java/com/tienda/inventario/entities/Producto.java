@@ -1,11 +1,18 @@
 package com.tienda.inventario.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "productos")
@@ -31,9 +38,9 @@ public class Producto {
     @OneToMany(mappedBy = "producto")
     private List<VentaProducto> ventaProductos;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "producto")
-    private List<Merma> mermas;
+private List<MermaProducto> mermaProductos = new ArrayList<>();
+
 
     public Producto() {
     }
@@ -122,12 +129,5 @@ public class Producto {
         this.ventaProductos = ventaProductos;
     }
 
-    public List<Merma> getMermas() {
-        return mermas;
-    }
-
-    public void setMermas(List<Merma> mermas) {
-        this.mermas = mermas;
-    }
 
 }

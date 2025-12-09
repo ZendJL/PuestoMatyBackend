@@ -5,7 +5,15 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.tienda.inventario.entities.Venta;
 import com.tienda.inventario.entities.VentaProducto;
@@ -32,10 +40,10 @@ public class VentaController {
         return v != null ? ResponseEntity.ok(v) : ResponseEntity.notFound().build();
     }
 
-       @PostMapping
+    // Crear venta con productos usando solo los tipos existentes
+    @PostMapping
     public ResponseEntity<Venta> crear(@RequestBody Venta venta) {
-        // Aquí la venta ya debe traer la lista de VentaProducto con los productos referenciados
-        Venta guardada = ventaService.guardar(venta);
+        Venta guardada = ventaService.crearVentaConProductos(venta);
         return ResponseEntity.ok(guardada);
     }
 
@@ -54,9 +62,9 @@ public class VentaController {
     }
 
     @GetMapping("/rango")
-public List<Venta> ventasEntreFechas(
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta) {
+    public List<Venta> ventasEntreFechas(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta) {
         return ventaService.ventasEntreFechas(desde, hasta);
     }
 
@@ -71,6 +79,4 @@ public List<Venta> ventasEntreFechas(
         if (v == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(ventaService.productosDeVenta(v));
     }
-
-    
 }

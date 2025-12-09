@@ -3,9 +3,16 @@ package com.tienda.inventario.entities;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "ventas")
@@ -16,31 +23,44 @@ public class Venta {
     private Long id;
 
     private LocalDateTime fecha;
-    private Long cuentaId; // si prefieres, puedes quitar esto y usar solo VentaCliente
+
+    @Column(name = "cuenta_id", insertable = false, updatable = false)
+    private Long cuentaId;
 
     private Float total;
+
     private String status;
+
+    @ManyToOne
+    @JoinColumn(name = "cuenta_id")
+    private CuentaCliente cuenta;
+
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+@com.fasterxml.jackson.annotation.JsonManagedReference
+private List<VentaProducto> ventaProductos;
+
     @OneToMany(mappedBy = "venta")
     private List<VentaCliente> ventasCliente;
 
     
-@OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
-@JsonManagedReference
-private List<VentaProducto> ventaProductos;
 
     public Venta() {
     }
 
-    public Venta(Long id, LocalDateTime fecha, Long cuentaId, Float total, String status) {
+    public Venta(Long id, LocalDateTime fecha, Long cuentaId, Float total, String status, CuentaCliente cuenta,
+            List<VentaProducto> ventaProductos, List<VentaCliente> ventasCliente) {
         this.id = id;
         this.fecha = fecha;
         this.cuentaId = cuentaId;
         this.total = total;
         this.status = status;
+        this.cuenta = cuenta;
+        this.ventaProductos = ventaProductos;
+        this.ventasCliente = ventasCliente;
     }
 
     public Long getId() {
-        return id;
+    return id;
     }
 
     public void setId(Long id) {
@@ -79,6 +99,22 @@ private List<VentaProducto> ventaProductos;
         this.status = status;
     }
 
+    public CuentaCliente getCuenta() {
+        return cuenta;
+    }
+
+    public void setCuenta(CuentaCliente cuenta) {
+        this.cuenta = cuenta;
+    }
+
+    public List<VentaProducto> getVentaProductos() {
+        return ventaProductos;
+    }
+
+    public void setVentaProductos(List<VentaProducto> ventaProductos) {
+        this.ventaProductos = ventaProductos;
+    }
+
     public List<VentaCliente> getVentasCliente() {
         return ventasCliente;
     }
@@ -87,13 +123,4 @@ private List<VentaProducto> ventaProductos;
         this.ventasCliente = ventasCliente;
     }
 
-    public List<VentaProducto> getVentaProductos() {
-    return ventaProductos;
-}
-
-    public void setVentaProductos(List<VentaProducto> ventaProductos) {
-        this.ventaProductos = ventaProductos;
-    }
-
-    
 }

@@ -1,6 +1,12 @@
 package com.tienda.inventario.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "venta_productos")
@@ -19,10 +25,7 @@ public class VentaProducto {
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
-    @Column(name = "cantidad", nullable = false)
     private Float cantidad;
-
-    @Column(name = "precio_unitario", nullable = false)
     private Float precioUnitario;
 
     public VentaProducto() {

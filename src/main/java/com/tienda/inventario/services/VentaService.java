@@ -22,7 +22,9 @@ public interface VentaService {
 
     List<VentaProducto> productosDeVenta(Venta venta);
 
-     Venta crearVentaConProductos(Venta venta, List<Long> productosIds, Float cantidad);
+     //Venta crearVentaConProductos(Venta venta, List<Long> productosIds, Float cantidad);
+// VentaService
+Venta crearVentaConProductos(Venta venta);
 
     
 }

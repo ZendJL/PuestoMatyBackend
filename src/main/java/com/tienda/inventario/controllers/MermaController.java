@@ -5,10 +5,16 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.tienda.inventario.entities.Merma;
-import com.tienda.inventario.entities.Producto;
 import com.tienda.inventario.services.MermaService;
 import com.tienda.inventario.services.ProductoService;
 
@@ -24,9 +30,10 @@ public class MermaController {
         this.productoService = productoService;
     }
 
-    @GetMapping
-    public List<Merma> listarTodas() {
-        return mermaService.listarTodas();
+     @GetMapping
+    public ResponseEntity<List<Merma>> listar() {
+        List<Merma> mermas = mermaService.listar();
+        return ResponseEntity.ok(mermas);
     }
 
     @GetMapping("/{id}")
@@ -36,21 +43,15 @@ public class MermaController {
     }
 
     @PostMapping
-    public ResponseEntity<Merma> crear(@RequestBody Merma merma) {
-        return ResponseEntity.ok(mermaService.guardar(merma));
-    }
+public ResponseEntity<Merma> crear(@RequestBody Merma merma) {
+    Merma guardada = mermaService.guardar(merma);
+    return ResponseEntity.ok(guardada);
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         mermaService.eliminar(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/producto/{productoId}")
-    public ResponseEntity<List<Merma>> mermasDeProducto(@PathVariable Long productoId) {
-        Producto p = productoService.buscarPorId(productoId);
-        if (p == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(mermaService.mermasDeProducto(p));
     }
 
     // tipoMerma: EXPIRADO, USO_PERSONAL, MAL_ESTADO, etc.
