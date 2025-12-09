@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.tienda.inventario.entities.Venta;
 import com.tienda.inventario.entities.VentaProducto;
-import com.tienda.inventario.entities.VentaProductoRequest;
 
 public interface VentaService {
 
@@ -23,9 +22,7 @@ public interface VentaService {
 
     List<VentaProducto> productosDeVenta(Venta venta);
 
-    Venta crearVentaConProductos(Venta venta, List<Long> productosIds);
-
-    Venta crearVentaConItems(Venta venta, List<VentaProductoRequest> items);
+     Venta crearVentaConProductos(Venta venta, List<Long> productosIds, Float cantidad);
 
     
 }

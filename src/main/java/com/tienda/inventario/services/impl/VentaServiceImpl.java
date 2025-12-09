@@ -67,7 +67,7 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    public Venta crearVentaConProductos(Venta venta, List<Long> productosIds) {
+    public Venta crearVentaConProductos(Venta venta, List<Long> productosIds, Float cantidad) {
         // 1. Guardar la venta
         Venta ventaGuardada = ventaRepository.save(venta);
 
@@ -77,7 +77,8 @@ public class VentaServiceImpl implements VentaService {
                 .map(prodId -> {
                     Producto p = productoRepository.findById(prodId)
                             .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + prodId));
-                    return new VentaProducto(ventaGuardada, p);
+                    Float precio = productoRepository.findPrecioById(prodId);
+                    return new VentaProducto(ventaGuardada, p, precio, cantidad);
                 })
                 .collect(Collectors.toList());
 
