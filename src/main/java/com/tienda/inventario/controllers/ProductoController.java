@@ -78,19 +78,22 @@ public class ProductoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizar(@PathVariable Integer id, @RequestBody Producto p) {
-        Producto existente = productoService.buscarPorId(id);
-        if (existente == null)
-            return ResponseEntity.notFound().build();
+public ResponseEntity<Producto> actualizar(@PathVariable Integer id,
+                                           @RequestBody Producto req) {
+    Producto existente = productoService.buscarPorId(id);
+    if (existente == null) return ResponseEntity.notFound().build();
 
-        existente.setDescripcion(p.getDescripcion());
-        existente.setPrecio(p.getPrecio());
-        existente.setProveedor(p.getProveedor());
-        existente.setCantidad(p.getCantidad());
-        existente.setActivo(p.getActivo()); // aquí se habilita / deshabilita
+    existente.setCodigo(req.getCodigo());              // ← importante
+    existente.setDescripcion(req.getDescripcion());
+    existente.setPrecio(req.getPrecio());
+    existente.setProveedor(req.getProveedor());
+    existente.setCantidad(req.getCantidad());
+    existente.setActivo(req.getActivo());
 
-        return ResponseEntity.ok(productoService.guardar(existente));
-    }
+    Producto guardado = productoService.guardar(existente);
+    return ResponseEntity.ok(guardado);
+}
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
