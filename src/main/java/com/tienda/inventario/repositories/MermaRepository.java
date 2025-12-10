@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.tienda.inventario.entities.Merma;
 
-public interface MermaRepository extends JpaRepository<Merma, Long> {
+public interface MermaRepository extends JpaRepository<Merma, Integer> {
 
     // Mermas por tipo (EXPIRADO, USO_PERSONAL, MAL_ESTADO...)
     List<Merma> findByTipoMerma(String tipoMerma);

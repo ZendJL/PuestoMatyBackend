@@ -20,12 +20,12 @@ public class Venta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private LocalDateTime fecha;
 
     @Column(name = "cuenta_id", insertable = false, updatable = false)
-    private Long cuentaId;
+    private Integer cuentaId;
 
     private Float total;
 
@@ -47,7 +47,7 @@ private List<VentaProducto> ventaProductos;
     public Venta() {
     }
 
-    public Venta(Long id, LocalDateTime fecha, Long cuentaId, Float total, String status, CuentaCliente cuenta,
+    public Venta(Integer id, LocalDateTime fecha, Integer cuentaId, Float total, String status, CuentaCliente cuenta,
             List<VentaProducto> ventaProductos, List<VentaCliente> ventasCliente) {
         this.id = id;
         this.fecha = fecha;
@@ -59,11 +59,11 @@ private List<VentaProducto> ventaProductos;
         this.ventasCliente = ventasCliente;
     }
 
-    public Long getId() {
+    public Integer getId() {
     return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -75,11 +75,11 @@ private List<VentaProducto> ventaProductos;
         this.fecha = fecha;
     }
 
-    public Long getCuentaId() {
+    public Integer getCuentaId() {
         return cuentaId;
     }
 
-    public void setCuentaId(Long cuentaId) {
+    public void setCuentaId(Integer cuentaId) {
         this.cuentaId = cuentaId;
     }
 

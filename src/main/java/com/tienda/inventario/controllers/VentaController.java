@@ -35,7 +35,7 @@ public class VentaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Venta> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<Venta> obtenerPorId(@PathVariable Integer id) {
         Venta v = ventaService.buscarPorId(id);
         return v != null ? ResponseEntity.ok(v) : ResponseEntity.notFound().build();
     }
@@ -48,7 +48,7 @@ public class VentaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Venta> actualizar(@PathVariable Long id, @RequestBody Venta venta) {
+    public ResponseEntity<Venta> actualizar(@PathVariable Integer id, @RequestBody Venta venta) {
         Venta existente = ventaService.buscarPorId(id);
         if (existente == null) return ResponseEntity.notFound().build();
         venta.setId(id);
@@ -56,7 +56,7 @@ public class VentaController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         ventaService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
@@ -74,7 +74,7 @@ public class VentaController {
     }
 
     @GetMapping("/{id}/productos")
-    public ResponseEntity<List<VentaProducto>> productosDeVenta(@PathVariable Long id) {
+    public ResponseEntity<List<VentaProducto>> productosDeVenta(@PathVariable Integer id) {
         Venta v = ventaService.buscarPorId(id);
         if (v == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(ventaService.productosDeVenta(v));

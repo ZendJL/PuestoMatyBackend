@@ -28,7 +28,7 @@ public class AbonoServiceImpl implements AbonoService {
     }
 
     @Override
-    public Abono buscarPorId(Long id) {
+    public Abono buscarPorId(Integer id) {
         return abonoRepository.findById(id).orElse(null);
     }
 
@@ -38,7 +38,7 @@ public class AbonoServiceImpl implements AbonoService {
     }
 
     @Override
-    public void eliminar(Long id) {
+    public void eliminar(Integer id) {
         abonoRepository.deleteById(id);
     }
 

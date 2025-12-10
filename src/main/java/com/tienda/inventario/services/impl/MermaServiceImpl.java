@@ -39,7 +39,7 @@ public class MermaServiceImpl implements MermaService {
 
     @Override
     @Transactional(readOnly = true)
-    public Merma buscarPorId(Long id) {
+    public Merma buscarPorId(Integer id) {
         return mermaRepository.findById(id).orElse(null);
     }
 
@@ -57,7 +57,7 @@ public class MermaServiceImpl implements MermaService {
 
     @Override
     @Transactional
-    public void eliminar(Long id) {
+    public void eliminar(Integer id) {
         mermaRepository.deleteById(id);
     }
 

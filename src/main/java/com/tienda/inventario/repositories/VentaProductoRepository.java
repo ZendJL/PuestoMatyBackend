@@ -8,7 +8,7 @@ import com.tienda.inventario.entities.Venta;
 import com.tienda.inventario.entities.VentaProducto;
 import com.tienda.inventario.entities.Producto;
 
-public interface VentaProductoRepository extends JpaRepository<VentaProducto, Long> {
+public interface VentaProductoRepository extends JpaRepository<VentaProducto, Integer> {
 
     List<VentaProducto> findByVenta(Venta venta);
 

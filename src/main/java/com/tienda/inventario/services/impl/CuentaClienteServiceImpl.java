@@ -25,7 +25,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
     }
 
     @Override
-    public CuentaCliente buscarPorId(Long id) {
+    public CuentaCliente buscarPorId(Integer id) {
         return cuentaClienteRepository.findById(id).orElse(null);
     }
 
@@ -35,7 +35,7 @@ public class CuentaClienteServiceImpl implements CuentaClienteService {
     }
 
     @Override
-    public void eliminar(Long id) {
+    public void eliminar(Integer id) {
         cuentaClienteRepository.deleteById(id);
     }
 

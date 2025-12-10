@@ -10,7 +10,7 @@ public class CuentaCliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String nombre;
     private String descripcion;
@@ -25,18 +25,18 @@ public class CuentaCliente {
     public CuentaCliente() {
     }
 
-    public CuentaCliente(Long id, String nombre, String descripcion, Float saldo) {
+    public CuentaCliente(Integer id, String nombre, String descripcion, Float saldo) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.saldo = saldo;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

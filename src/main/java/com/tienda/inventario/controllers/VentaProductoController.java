@@ -35,7 +35,7 @@ public class VentaProductoController {
 
     // Detalle por venta (lo que ya tenías)
     @GetMapping("/venta/{ventaId}")
-    public ResponseEntity<List<VentaProducto>> obtenerProductosDeVenta(@PathVariable Long ventaId) {
+    public ResponseEntity<List<VentaProducto>> obtenerProductosDeVenta(@PathVariable Integer ventaId) {
         Venta venta = ventaService.buscarPorId(ventaId);
         if (venta == null) {
             return ResponseEntity.notFound().build();

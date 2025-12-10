@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.tienda.inventario.entities.CuentaCliente;
 
-public interface CuentaClienteRepository extends JpaRepository<CuentaCliente, Long> {
+public interface CuentaClienteRepository extends JpaRepository<CuentaCliente, Integer> {
 
     // Buscar por nombre
     List<CuentaCliente> findByNombreContainingIgnoreCase(String nombre);

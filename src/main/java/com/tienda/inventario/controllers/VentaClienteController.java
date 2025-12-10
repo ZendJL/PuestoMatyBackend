@@ -30,8 +30,8 @@ public class VentaClienteController {
 
     // Crear relación venta-cuenta (asociar una venta a una cuenta de cliente)
     @PostMapping
-    public ResponseEntity<VentaCliente> crear(@RequestParam Long ventaId,
-                                              @RequestParam Long cuentaId) {
+    public ResponseEntity<VentaCliente> crear(@RequestParam Integer ventaId,
+                                              @RequestParam Integer cuentaId) {
         Venta venta = ventaService.buscarPorId(ventaId);
         if (venta == null) {
             return ResponseEntity.notFound().build();
@@ -46,7 +46,7 @@ public class VentaClienteController {
 
     // Listar ventas asociadas a una cuenta
     @GetMapping("/cuenta/{cuentaId}")
-    public ResponseEntity<List<VentaCliente>> ventasDeCuenta(@PathVariable Long cuentaId) {
+    public ResponseEntity<List<VentaCliente>> ventasDeCuenta(@PathVariable Integer cuentaId) {
         CuentaCliente cuenta = cuentaClienteService.buscarPorId(cuentaId);
         if (cuenta == null) {
             return ResponseEntity.notFound().build();
@@ -56,7 +56,7 @@ public class VentaClienteController {
 
     // Listar cuentas asociadas a una venta
     @GetMapping("/venta/{ventaId}")
-    public ResponseEntity<List<VentaCliente>> cuentasDeVenta(@PathVariable Long ventaId) {
+    public ResponseEntity<List<VentaCliente>> cuentasDeVenta(@PathVariable Integer ventaId) {
         Venta venta = ventaService.buscarPorId(ventaId);
         if (venta == null) {
             return ResponseEntity.notFound().build();

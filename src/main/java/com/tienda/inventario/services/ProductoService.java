@@ -11,9 +11,9 @@ public interface ProductoService {
 
     Producto guardar(Producto producto);
 
-    Producto buscarPorId(Long id);
+    Producto buscarPorId(Integer id);
 
-    void eliminar(Long id);
+    void eliminar(Integer id);
 
     List<Producto> findByActivoTrue();
 

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.tienda.inventario.entities.Abono;
 import com.tienda.inventario.entities.CuentaCliente;
 
-public interface AbonoRepository extends JpaRepository<Abono, Long> {
+public interface AbonoRepository extends JpaRepository<Abono, Integer> {
 
     // Abonos de una cuenta
     List<Abono> findByCuentaOrderByFechaDesc(CuentaCliente cuenta);

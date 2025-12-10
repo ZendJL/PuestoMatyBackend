@@ -10,11 +10,11 @@ public interface AbonoService {
 
     Abono guardar(Abono abono);
 
-    Abono buscarPorId(Long id);
+    Abono buscarPorId(Integer id);
 
     List<Abono> listarTodos();
 
-    void eliminar(Long id);
+    void eliminar(Integer id);
 
     List<Abono> abonosDeCuenta(CuentaCliente cuenta);
 

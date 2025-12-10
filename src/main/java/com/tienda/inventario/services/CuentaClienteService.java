@@ -8,11 +8,11 @@ public interface CuentaClienteService {
 
     CuentaCliente guardar(CuentaCliente cuenta);
 
-    CuentaCliente buscarPorId(Long id);
+    CuentaCliente buscarPorId(Integer id);
 
     List<CuentaCliente> listarTodas();
 
-    void eliminar(Long id);
+    void eliminar(Integer id);
 
     List<CuentaCliente> buscarPorNombre(String nombre);
 

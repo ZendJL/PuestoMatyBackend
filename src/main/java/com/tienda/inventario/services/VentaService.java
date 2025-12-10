@@ -10,11 +10,11 @@ public interface VentaService {
 
     Venta guardar(Venta venta);
 
-    Venta buscarPorId(Long id);
+    Venta buscarPorId(Integer id);
 
     List<Venta> listarTodas();
 
-    void eliminar(Long id);
+    void eliminar(Integer id);
 
     List<Venta> ventasEntreFechas(LocalDateTime desde, LocalDateTime hasta);
 
@@ -22,7 +22,7 @@ public interface VentaService {
 
     List<VentaProducto> productosDeVenta(Venta venta);
 
-     //Venta crearVentaConProductos(Venta venta, List<Long> productosIds, Float cantidad);
+     //Venta crearVentaConProductos(Venta venta, List<Integer> productosIds, Float cantidad);
 // VentaService
 Venta crearVentaConProductos(Venta venta);
 

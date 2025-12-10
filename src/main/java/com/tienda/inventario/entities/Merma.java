@@ -19,7 +19,7 @@ public class Merma {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "tipo_merma", nullable = false, length = 25)
     private String tipoMerma; // EXPIRADO, USO_PERSONAL, MAL_ESTADO, etc.
@@ -38,17 +38,17 @@ public class Merma {
     }
 
     public Merma(Producto producto, String tipoMerma, String descripcion,
-                 LocalDateTime fechaSalida, Long cantidad) {
+                 LocalDateTime fechaSalida, Integer cantidad) {
         this.tipoMerma = tipoMerma;
         this.descripcion = descripcion;
         this.fechaSalida = fechaSalida;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

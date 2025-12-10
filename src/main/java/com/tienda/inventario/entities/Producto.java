@@ -20,13 +20,13 @@ public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String codigo;
     private String descripcion;
     private Float precio;
     private String proveedor;
-    private Long cantidad;
+    private Integer cantidad;
 
     @Column(name = "ultima_compra")
     private LocalDateTime ultimaCompra;
@@ -47,8 +47,8 @@ public class Producto {
     public Producto() {
     }
 
-    public Producto(Long id, String codigo, String descripcion, Float precio,
-            String proveedor, Long cantidad, LocalDateTime ultimaCompra, Boolean activo) {
+    public Producto(Integer id, String codigo, String descripcion, Float precio,
+            String proveedor, Integer cantidad, LocalDateTime ultimaCompra, Boolean activo) {
         this.id = id;
         this.codigo = codigo;
         this.descripcion = descripcion;
@@ -59,11 +59,11 @@ public class Producto {
         this.activo = activo;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -99,11 +99,11 @@ public class Producto {
         this.proveedor = proveedor;
     }
 
-    public Long getCantidad() {
+    public Integer getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(Long cantidad) {
+    public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
     }
 

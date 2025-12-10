@@ -32,18 +32,18 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public Producto buscarPorId(Long id) {
+    public Producto buscarPorId(Integer id) {
         return productoRepository.findById(id).orElse(null);
     }
 
     @Override
-    public void eliminar(Long id) {
+    public void eliminar(Integer id) {
         productoRepository.deleteById(id);
     }
 
     @Override
     public List<Producto> productosConStock() {
-        return productoRepository.findByCantidadGreaterThan(0L);
+        return productoRepository.findByCantidadGreaterThan(0);
     }
 
 

@@ -33,7 +33,7 @@ public class CuentaClienteController {
 
     @PostMapping("/{id}/abonar")
     public ResponseEntity<CuentaCliente> abonar(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @RequestParam("monto") Float monto) {
 
         if (monto == null || monto <= 0f) {
@@ -74,7 +74,7 @@ public class CuentaClienteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CuentaCliente> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<CuentaCliente> obtenerPorId(@PathVariable Integer id) {
         CuentaCliente c = cuentaClienteService.buscarPorId(id);
         return c != null ? ResponseEntity.ok(c) : ResponseEntity.notFound().build();
     }
@@ -85,7 +85,7 @@ public class CuentaClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CuentaCliente> actualizar(@PathVariable Long id, @RequestBody CuentaCliente cuenta) {
+    public ResponseEntity<CuentaCliente> actualizar(@PathVariable Integer id, @RequestBody CuentaCliente cuenta) {
         CuentaCliente existente = cuentaClienteService.buscarPorId(id);
         if (existente == null)
             return ResponseEntity.notFound().build();
@@ -94,7 +94,7 @@ public class CuentaClienteController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         cuentaClienteService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

@@ -42,7 +42,7 @@ public class ProductoController {
     // ProductoController.java
     @PostMapping("/{id}/agregar-stock")
     public ResponseEntity<Producto> agregarStock(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @RequestParam("cantidad") Integer cantidadAgregar) {
 
         if (cantidadAgregar == null || cantidadAgregar <= 0) {
@@ -54,7 +54,7 @@ public class ProductoController {
             return ResponseEntity.notFound().build();
         }
 
-        Long nuevoStock = (producto.getCantidad() == null ? 0 : producto.getCantidad())
+        Integer nuevoStock = (producto.getCantidad() == null ? 0 : producto.getCantidad())
                 + cantidadAgregar;
         producto.setCantidad(nuevoStock);
         producto.setUltimaCompra(LocalDateTime.now());
@@ -64,7 +64,7 @@ public class ProductoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<Producto> obtenerPorId(@PathVariable Integer id) {
         Producto p = productoService.buscarPorId(id);
         return p != null ? ResponseEntity.ok(p) : ResponseEntity.notFound().build();
     }
@@ -78,7 +78,7 @@ public class ProductoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizar(@PathVariable Long id, @RequestBody Producto p) {
+    public ResponseEntity<Producto> actualizar(@PathVariable Integer id, @RequestBody Producto p) {
         Producto existente = productoService.buscarPorId(id);
         if (existente == null)
             return ResponseEntity.notFound().build();
@@ -93,7 +93,7 @@ public class ProductoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         productoService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

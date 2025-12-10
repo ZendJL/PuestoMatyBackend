@@ -8,6 +8,6 @@ import com.tienda.inventario.entities.MermaProducto;
 import com.tienda.inventario.entities.Producto;
 
 
-public interface MermaProductoRepository extends JpaRepository<MermaProducto, Long> {
+public interface MermaProductoRepository extends JpaRepository<MermaProducto, Integer> {
     List<MermaProducto> findByProducto(Producto producto);
 }

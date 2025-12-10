@@ -42,7 +42,7 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    public Venta buscarPorId(Long id) {
+    public Venta buscarPorId(Integer id) {
         return ventaRepository.findById(id).orElse(null);
     }
 
@@ -52,7 +52,7 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    public void eliminar(Long id) {
+    public void eliminar(Integer id) {
         ventaRepository.deleteById(id);
     }
 
@@ -85,7 +85,7 @@ public Venta crearVentaConProductos(Venta venta) {
     if (venta.getVentaProductos() != null) {
         for (VentaProducto vp : venta.getVentaProductos()) {
 
-            Long prodId = vp.getProducto().getId();
+            Integer prodId = vp.getProducto().getId();
             Producto producto = productoRepository.findById(prodId)
                     .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + prodId));
 
@@ -99,8 +99,8 @@ public Venta crearVentaConProductos(Venta venta) {
             }
 
             // 1) Restar stock
-            Long stockActual = producto.getCantidad();
-            Long nuevaCantidad = stockActual - vp.getCantidad();
+            Integer stockActual = producto.getCantidad();
+            Integer nuevaCantidad = stockActual - vp.getCantidad();
             if (nuevaCantidad < 0) {
                 throw new IllegalArgumentException("Stock insuficiente para el producto " + producto.getDescripcion());
             }

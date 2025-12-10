@@ -37,7 +37,7 @@ public class MermaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Merma> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<Merma> obtenerPorId(@PathVariable Integer id) {
         Merma m = mermaService.buscarPorId(id);
         return m != null ? ResponseEntity.ok(m) : ResponseEntity.notFound().build();
     }
@@ -56,7 +56,7 @@ public ResponseEntity<Merma> crear(@RequestBody Merma merma) {
 
     // Actualizar stock de cada producto
         merma.getMermaProductos().forEach(mp -> {
-        Long productoId = mp.getProducto().getId();
+        Integer productoId = mp.getProducto().getId();
         Integer cantMerma = mp.getCantidad();
 
         var producto = productoService.buscarPorId(productoId);
@@ -64,8 +64,8 @@ public ResponseEntity<Merma> crear(@RequestBody Merma merma) {
             throw new IllegalArgumentException("Producto no encontrado: " + productoId);
         }
 
-        long stockActual = producto.getCantidad() == null ? 0 : producto.getCantidad();
-        long nuevoStock = stockActual - cantMerma;
+        Integer stockActual = producto.getCantidad() == null ? 0 : producto.getCantidad();
+        Integer nuevoStock = stockActual - cantMerma;
         if (nuevoStock < 0) {
             nuevoStock = 0; // o lanza excepción si no quieres permitirlo
         }
@@ -82,7 +82,7 @@ public ResponseEntity<Merma> crear(@RequestBody Merma merma) {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         mermaService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

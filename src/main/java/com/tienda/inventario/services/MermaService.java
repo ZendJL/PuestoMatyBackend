@@ -11,13 +11,13 @@ public interface MermaService {
 
     Merma guardar(Merma merma);
 
-    Merma buscarPorId(Long id);
+    Merma buscarPorId(Integer id);
 
     List<Merma> listarTodas();
     
     List<Merma> listar();
 
-    void eliminar(Long id);
+    void eliminar(Integer id);
 
     public List<MermaProducto> mermasDeProducto(Producto producto);
 

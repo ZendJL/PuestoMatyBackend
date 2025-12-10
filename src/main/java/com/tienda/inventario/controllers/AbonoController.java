@@ -38,7 +38,7 @@ public class AbonoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Abono> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<Abono> obtenerPorId(@PathVariable Integer id) {
         Abono a = abonoService.buscarPorId(id);
         return a != null ? ResponseEntity.ok(a) : ResponseEntity.notFound().build();
     }
@@ -49,13 +49,13 @@ public class AbonoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         abonoService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/cuenta/{cuentaId}")
-    public ResponseEntity<List<Abono>> abonosDeCuenta(@PathVariable Long cuentaId) {
+    public ResponseEntity<List<Abono>> abonosDeCuenta(@PathVariable Integer cuentaId) {
         CuentaCliente cuenta = cuentaClienteService.buscarPorId(cuentaId);
         if (cuenta == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(abonoService.abonosDeCuenta(cuenta));
@@ -63,7 +63,7 @@ public class AbonoController {
 
     @GetMapping("/cuenta/{cuentaId}/rango")
     public ResponseEntity<List<Abono>> abonosDeCuentaEntreFechas(
-            @PathVariable Long cuentaId,
+            @PathVariable Integer cuentaId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta) {
         CuentaCliente cuenta = cuentaClienteService.buscarPorId(cuentaId);

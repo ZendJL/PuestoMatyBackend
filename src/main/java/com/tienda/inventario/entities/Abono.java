@@ -17,7 +17,7 @@ public class Abono {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha;
@@ -37,7 +37,7 @@ public class Abono {
     private Float nuevoSaldo;
 
     @com.fasterxml.jackson.annotation.JsonProperty("cuentaId")
-    public Long getCuentaId() {
+    public Integer getCuentaId() {
         return cuenta != null ? cuenta.getId() : null;
     }
 
@@ -53,11 +53,11 @@ public class Abono {
         this.nuevoSaldo = nuevoSaldo;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
