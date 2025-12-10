@@ -36,10 +36,10 @@ public class ProductoController {
     // productos activos para vender
     @GetMapping("/activos")
     public List<Producto> listarActivos() {
-        return productoService.findByActivoTrue(); // usa findByActivoTrue()
+        return productoService.findByActivoTrue();
     }
 
-    // ProductoController.java
+    // Agregar stock a un producto
     @PostMapping("/{id}/agregar-stock")
     public ResponseEntity<Producto> agregarStock(
             @PathVariable Integer id,
@@ -74,26 +74,27 @@ public class ProductoController {
         if (p.getActivo() == null) {
             p.setActivo(true); // por defecto activo
         }
+        // precioCompra llega en el JSON y se guarda automáticamente
         return ResponseEntity.ok(productoService.guardar(p));
     }
 
     @PutMapping("/{id}")
-public ResponseEntity<Producto> actualizar(@PathVariable Integer id,
-                                           @RequestBody Producto req) {
-    Producto existente = productoService.buscarPorId(id);
-    if (existente == null) return ResponseEntity.notFound().build();
+    public ResponseEntity<Producto> actualizar(@PathVariable Integer id,
+                                               @RequestBody Producto req) {
+        Producto existente = productoService.buscarPorId(id);
+        if (existente == null) return ResponseEntity.notFound().build();
 
-    existente.setCodigo(req.getCodigo());              // ← importante
-    existente.setDescripcion(req.getDescripcion());
-    existente.setPrecio(req.getPrecio());
-    existente.setProveedor(req.getProveedor());
-    existente.setCantidad(req.getCantidad());
-    existente.setActivo(req.getActivo());
+        existente.setCodigo(req.getCodigo());
+        existente.setDescripcion(req.getDescripcion());
+        existente.setPrecio(req.getPrecio());
+        existente.setPrecioCompra(req.getPrecioCompra());   // NUEVO CAMPO
+        existente.setProveedor(req.getProveedor());
+        existente.setCantidad(req.getCantidad());
+        existente.setActivo(req.getActivo());
 
-    Producto guardado = productoService.guardar(existente);
-    return ResponseEntity.ok(guardado);
-}
-
+        Producto guardado = productoService.guardar(existente);
+        return ResponseEntity.ok(guardado);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Integer id) {

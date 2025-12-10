@@ -34,7 +34,7 @@ public class Producto {
     @Column(name = "activo")
     private Boolean activo;
 
-      @JsonIgnore
+    @JsonIgnore
     @OneToMany(mappedBy = "producto")
     private List<VentaProducto> ventaProductos = new ArrayList<>();
 
@@ -42,7 +42,8 @@ public class Producto {
     @OneToMany(mappedBy = "producto")
     private List<MermaProducto> mermaProductos = new ArrayList<>();
 
-
+    @Column(name = "precio_compra")
+    private Float precioCompra;
 
     public Producto() {
     }
@@ -138,6 +139,13 @@ public class Producto {
     public void setMermaProductos(List<MermaProducto> mermaProductos) {
         this.mermaProductos = mermaProductos;
     }
-    
+
+    public Float getPrecioCompra() {
+        return precioCompra;
+    }
+
+    public void setPrecioCompra(Float precioCompra) {
+        this.precioCompra = precioCompra;
+    }
 
 }
