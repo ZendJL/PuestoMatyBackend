@@ -35,6 +35,9 @@ public class Venta {
     @JoinColumn(name = "cuenta_id")
     private CuentaCliente cuenta;
 
+    @Column(name = "pago_cliente")
+    private Float pagoCliente;
+
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
 @com.fasterxml.jackson.annotation.JsonManagedReference
 private List<VentaProducto> ventaProductos;
@@ -122,5 +125,15 @@ private List<VentaProducto> ventaProductos;
     public void setVentasCliente(List<VentaCliente> ventasCliente) {
         this.ventasCliente = ventasCliente;
     }
+
+
+    public Float getPagoCliente() {
+        return pagoCliente;
+    }
+
+    public void setPagoCliente(Float pagoCliente) {
+        this.pagoCliente = pagoCliente;
+    }
+
 
 }
