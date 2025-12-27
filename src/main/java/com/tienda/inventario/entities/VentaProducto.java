@@ -6,6 +6,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,7 +34,7 @@ public class VentaProducto {
             return null;
         Map<String, Object> m = new HashMap<>();
         m.put("id", venta.getId());
-        m.put("fecha", venta.getFecha()); // LocalDateTime se serializa a ISO
+        m.put("fecha", venta.getFecha());
         return m;
     }
 
@@ -44,55 +45,36 @@ public class VentaProducto {
     private Integer cantidad;
     private Float precioUnitario;
 
+    // Nuevo: costo total (según FIFO) de esta línea
+    @Column(name = "costo_total")
+    private Float costoTotal;
+
     public VentaProducto() {
     }
 
     public VentaProducto(Venta venta, Producto producto,
-            Integer cantidad, Float precioUnitario) {
+                         Integer cantidad, Float precioUnitario) {
         this.venta = venta;
         this.producto = producto;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
     }
 
-    public Integer getId() {
-        return id;
-    }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    public Venta getVenta() { return venta; }
+    public void setVenta(Venta venta) { this.venta = venta; }
 
-    public Venta getVenta() {
-        return venta;
-    }
+    public Producto getProducto() { return producto; }
+    public void setProducto(Producto producto) { this.producto = producto; }
 
-    public void setVenta(Venta venta) {
-        this.venta = venta;
-    }
+    public Integer getCantidad() { return cantidad; }
+    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
 
-    public Producto getProducto() {
-        return producto;
-    }
+    public Float getPrecioUnitario() { return precioUnitario; }
+    public void setPrecioUnitario(Float precioUnitario) { this.precioUnitario = precioUnitario; }
 
-    public void setProducto(Producto producto) {
-        this.producto = producto;
-    }
-
-    public Integer getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public Float getPrecioUnitario() {
-        return precioUnitario;
-    }
-
-    public void setPrecioUnitario(Float precioUnitario) {
-        this.precioUnitario = precioUnitario;
-    }
-
+    public Float getCostoTotal() { return costoTotal; }
+    public void setCostoTotal(Float costoTotal) { this.costoTotal = costoTotal; }
 }

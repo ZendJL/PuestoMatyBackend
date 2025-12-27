@@ -45,8 +45,8 @@ public class MermaController {
     @PostMapping
 public ResponseEntity<Merma> crear(@RequestBody Merma merma) {
     // Asegurar fecha si viene nula
-    if (merma.getFechaSalida() == null) {
-        merma.setFechaSalida(LocalDateTime.now());
+    if (merma.getFecha() == null) {
+        merma.setFecha(LocalDateTime.now());
     }
 
     // Validar que haya productos en la merma

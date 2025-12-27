@@ -13,7 +13,7 @@ public interface MermaService {
 
     Merma buscarPorId(Integer id);
 
-    List<Merma> listarTodas();
+    //List<Merma> listarTodas();
     
     List<Merma> listar();
 
@@ -24,4 +24,10 @@ public interface MermaService {
     List<Merma> mermasPorTipoYRango(String tipoMerma, LocalDateTime desde, LocalDateTime hasta);
 
     List<Merma> mermasEntreFechas(LocalDateTime desde, LocalDateTime hasta);
+
+    /**
+     * Crea una merma con sus productos, restando stock por FIFO desde compra_productos.
+     * Se asume que la Merma llega con la lista mermaProductos llena (producto + cantidad).
+     */
+    Merma crearMermaConProductos(Merma merma);
 }

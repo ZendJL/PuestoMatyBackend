@@ -45,6 +45,10 @@ public class Producto {
     @Column(name = "precio_compra")
     private Float precioCompra;
 
+    @JsonIgnore
+@OneToMany(mappedBy = "producto")
+private List<CompraProducto> compraProductos = new ArrayList<>();
+
     public Producto() {
     }
 
@@ -147,5 +151,13 @@ public class Producto {
     public void setPrecioCompra(Float precioCompra) {
         this.precioCompra = precioCompra;
     }
+
+    public List<CompraProducto> getCompraProductos() {
+    return compraProductos;
+}
+
+public void setCompraProductos(List<CompraProducto> compraProductos) {
+    this.compraProductos = compraProductos;
+}
 
 }

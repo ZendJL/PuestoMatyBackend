@@ -1,6 +1,6 @@
 package com.tienda.inventario.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,7 +21,7 @@ public class MermaProducto {
 
     @ManyToOne
     @JoinColumn(name = "merma_id")
-    @JsonIgnore  
+    @JsonBackReference
     private Merma merma;
 
     @ManyToOne
@@ -30,6 +30,9 @@ public class MermaProducto {
 
     @Column(nullable = false)
     private Integer cantidad;
+
+    @Column(name = "costo_total")
+    private Float costoTotal;
 
     public MermaProducto() {
     }
@@ -72,4 +75,11 @@ public class MermaProducto {
         this.cantidad = cantidad;
     }
 
+    public Float getCostoTotal() {
+        return costoTotal;
+    }
+
+    public void setCostoTotal(Float costoTotal) {
+        this.costoTotal = costoTotal;
+    }
 }

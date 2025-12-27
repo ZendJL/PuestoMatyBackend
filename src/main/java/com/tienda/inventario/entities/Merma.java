@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,27 +23,35 @@ public class Merma {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "tipo_merma", nullable = false, length = 25)
-    private String tipoMerma; // EXPIRADO, USO_PERSONAL, MAL_ESTADO, etc.
+    // fecha de registro de la merma (puede ser nullable si quieres)
+    @Column(name = "fecha")
+    private LocalDateTime fecha;
 
-    @Column(name = "descripcion", length = 100)
-    private String descripcion;
-
+    // fecha efectiva de salida de los productos, NOT NULL
     @Column(name = "fecha_salida", nullable = false)
     private LocalDateTime fechaSalida;
 
+    // tipo de merma: "CADUCIDAD", "ROBO", "ROTURA", etc.
+    @Column(name = "tipo_merma")
+    private String tipoMerma;
+
+    // descripción general opcional
+    @Column(name = "motivo_general")
+    private String motivoGeneral;
+
     @OneToMany(mappedBy = "merma", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<MermaProducto> mermaProductos = new ArrayList<>();
 
-    
     public Merma() {
     }
 
-    public Merma(Producto producto, String tipoMerma, String descripcion,
-                 LocalDateTime fechaSalida, Integer cantidad) {
-        this.tipoMerma = tipoMerma;
-        this.descripcion = descripcion;
+    public Merma(LocalDateTime fecha, LocalDateTime fechaSalida,
+            String tipoMerma, String motivoGeneral) {
+        this.fecha = fecha;
         this.fechaSalida = fechaSalida;
+        this.tipoMerma = tipoMerma;
+        this.motivoGeneral = motivoGeneral;
     }
 
     public Integer getId() {
@@ -52,20 +62,12 @@ public class Merma {
         this.id = id;
     }
 
-    public String getTipoMerma() {
-        return tipoMerma;
+    public LocalDateTime getFecha() {
+        return fecha;
     }
 
-    public void setTipoMerma(String tipoMerma) {
-        this.tipoMerma = tipoMerma;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
     }
 
     public LocalDateTime getFechaSalida() {
@@ -76,6 +78,22 @@ public class Merma {
         this.fechaSalida = fechaSalida;
     }
 
+    public String getTipoMerma() {
+        return tipoMerma;
+    }
+
+    public void setTipoMerma(String tipoMerma) {
+        this.tipoMerma = tipoMerma;
+    }
+
+    public String getMotivoGeneral() {
+        return motivoGeneral;
+    }
+
+    public void setMotivoGeneral(String motivoGeneral) {
+        this.motivoGeneral = motivoGeneral;
+    }
+
     public List<MermaProducto> getMermaProductos() {
         return mermaProductos;
     }
@@ -84,7 +102,8 @@ public class Merma {
         this.mermaProductos = mermaProductos;
     }
 
-    
-
-    
+    public void agregarDetalle(MermaProducto mp) {
+        mermaProductos.add(mp);
+        mp.setMerma(this);
+    }
 }

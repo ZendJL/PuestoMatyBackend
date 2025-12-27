@@ -20,4 +20,9 @@ public interface ProductoService {
     List<Producto> productosConStock();
 
     List<Producto> productosCompradosEnRango(LocalDateTime desde, LocalDateTime hasta);
+
+    Producto registrarCompra(Integer productoId, int cantidad, float precioCompra);
+    
+    Producto actualizarCostoCompraYUltimoLote(Integer productoId, float nuevoPrecioCompra);
+
 }

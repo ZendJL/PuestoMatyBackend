@@ -33,19 +33,19 @@ public class ProductoController {
         return productoService.listarTodos();
     }
 
-    // productos activos para vender
     @GetMapping("/activos")
     public List<Producto> listarActivos() {
         return productoService.findByActivoTrue();
     }
 
-    // Agregar stock a un producto
+    // Agregar stock a un producto (registrar compra + lote)
     @PostMapping("/{id}/agregar-stock")
     public ResponseEntity<Producto> agregarStock(
             @PathVariable Integer id,
-            @RequestParam("cantidad") Integer cantidadAgregar) {
+            @RequestParam("cantidad") Integer cantidadAgregar,
+            @RequestParam("precioCompra") Float precioCompra) {
 
-        if (cantidadAgregar == null || cantidadAgregar <= 0) {
+        if (cantidadAgregar == null || cantidadAgregar <= 0 || precioCompra == null || precioCompra < 0) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -54,13 +54,9 @@ public class ProductoController {
             return ResponseEntity.notFound().build();
         }
 
-        Integer nuevoStock = (producto.getCantidad() == null ? 0 : producto.getCantidad())
-                + cantidadAgregar;
-        producto.setCantidad(nuevoStock);
-        producto.setUltimaCompra(LocalDateTime.now());
-
-        Producto guardado = productoService.guardar(producto);
-        return ResponseEntity.ok(guardado);
+        // Usa la lógica de negocio centralizada en el servicio:
+        Producto actualizado = productoService.registrarCompra(id, cantidadAgregar, precioCompra);
+        return ResponseEntity.ok(actualizado);
     }
 
     @GetMapping("/{id}")
@@ -72,28 +68,44 @@ public class ProductoController {
     @PostMapping
     public ResponseEntity<Producto> crear(@RequestBody Producto p) {
         if (p.getActivo() == null) {
-            p.setActivo(true); // por defecto activo
+            p.setActivo(true);
         }
-        // precioCompra llega en el JSON y se guarda automáticamente
         return ResponseEntity.ok(productoService.guardar(p));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizar(@PathVariable Integer id,
-                                               @RequestBody Producto req) {
+            @RequestBody Producto req) {
         Producto existente = productoService.buscarPorId(id);
-        if (existente == null) return ResponseEntity.notFound().build();
+        if (existente == null)
+            return ResponseEntity.notFound().build();
+
+        boolean cambiaCosto = req.getPrecioCompra() != null
+                && !req.getPrecioCompra().equals(existente.getPrecioCompra());
 
         existente.setCodigo(req.getCodigo());
         existente.setDescripcion(req.getDescripcion());
         existente.setPrecio(req.getPrecio());
-        existente.setPrecioCompra(req.getPrecioCompra());   // NUEVO CAMPO
         existente.setProveedor(req.getProveedor());
         existente.setCantidad(req.getCantidad());
         existente.setActivo(req.getActivo());
 
-        Producto guardado = productoService.guardar(existente);
-        return ResponseEntity.ok(guardado);
+        if (cambiaCosto) {
+            // actualiza producto + último lote
+            Producto actualizado = productoService
+                    .actualizarCostoCompraYUltimoLote(id, req.getPrecioCompra());
+            // reflejar demás cambios en el objeto
+            actualizado.setCodigo(existente.getCodigo());
+            actualizado.setDescripcion(existente.getDescripcion());
+            actualizado.setPrecio(existente.getPrecio());
+            actualizado.setProveedor(existente.getProveedor());
+            actualizado.setCantidad(existente.getCantidad());
+            actualizado.setActivo(existente.getActivo());
+            return ResponseEntity.ok(productoService.guardar(actualizado));
+        } else {
+            existente.setPrecioCompra(req.getPrecioCompra());
+            return ResponseEntity.ok(productoService.guardar(existente));
+        }
     }
 
     @DeleteMapping("/{id}")
