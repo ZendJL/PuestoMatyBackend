@@ -26,24 +26,19 @@ public class MermaServiceImpl implements MermaService {
     private final CompraProductoRepository compraProductoRepository;
 
     public MermaServiceImpl(MermaRepository mermaRepository,
-                            MermaProductoRepository mermaProductoRepository,
-                            ProductoRepository productoRepository,
-                            CompraProductoRepository compraProductoRepository) {
+            MermaProductoRepository mermaProductoRepository,
+            ProductoRepository productoRepository,
+            CompraProductoRepository compraProductoRepository) {
         this.mermaRepository = mermaRepository;
         this.mermaProductoRepository = mermaProductoRepository;
         this.productoRepository = productoRepository;
         this.compraProductoRepository = compraProductoRepository;
     }
 
-    // ===== Métodos básicos =====
-
     @Override
     public Merma guardar(Merma merma) {
         if (merma.getFecha() == null) {
             merma.setFecha(LocalDateTime.now());
-        }
-        if (merma.getFechaSalida() == null) {
-            merma.setFechaSalida(LocalDateTime.now());
         }
         return mermaRepository.save(merma);
     }
@@ -70,79 +65,87 @@ public class MermaServiceImpl implements MermaService {
 
     @Override
     public List<Merma> mermasPorTipoYRango(String tipoMerma,
-                                           LocalDateTime desde,
-                                           LocalDateTime hasta) {
-        // si tus queries siguen usando "fecha", deja esto así;
-        // si cambiaste el repo a fechaSalida, ajusta el nombre del método
-        return mermaRepository.findByTipoMermaAndFechaSalidaBetween(tipoMerma, desde, hasta);
+            LocalDateTime desde,
+            LocalDateTime hasta) {
+        return mermaRepository.findByTipoMermaAndFechaBetween(tipoMerma, desde, hasta);
     }
 
     @Override
-    public List<Merma> mermasEntreFechas(LocalDateTime desde, LocalDateTime hasta) {
-        return mermaRepository.findByFechaSalidaBetween(desde, hasta);
+    public List<Merma> mermasEntreFechas(LocalDateTime desde,
+            LocalDateTime hasta) {
+        return mermaRepository.findByFechaBetween(desde, hasta);
     }
 
-    // ===== Crear merma con detalle y consumo FIFO =====
+    // ===================== LÓGICA COMPLETA MERMA + FIFO =====================
 
-    /**
-     * Crea una merma con sus productos, restando stock en Producto y en la tabla
-     * compra_productos por FIFO. Se espera que merma.mermaProductos venga con
-     * producto (id) y cantidad para cada línea.
-     */
     @Override
     @Transactional
     public Merma crearMermaConProductos(Merma merma) {
+
         if (merma.getFecha() == null) {
             merma.setFecha(LocalDateTime.now());
         }
-        if (merma.getFechaSalida() == null) {
-            merma.setFechaSalida(LocalDateTime.now());
-        }
+
+        float totalMerma = 0f;
 
         if (merma.getMermaProductos() != null) {
+
             for (MermaProducto mp : merma.getMermaProductos()) {
 
                 Integer prodId = mp.getProducto().getId();
+
+                // 1) Cargar producto y enlazar relaciones
                 Producto producto = productoRepository.findById(prodId)
                         .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + prodId));
 
-                // enlazar relaciones
                 mp.setMerma(merma);
                 mp.setProducto(producto);
 
+                // 2) Validar cantidad de merma
+                if (mp.getCantidad() == null || mp.getCantidad() <= 0) {
+                    throw new IllegalArgumentException(
+                            "La cantidad de merma debe ser mayor que cero para el producto "
+                                    + producto.getDescripcion());
+                }
+
                 int cantidadMerma = mp.getCantidad();
 
-                // 1) Restar stock total de productos
                 int stockActual = producto.getCantidad() == null ? 0 : producto.getCantidad();
-                int nuevoStock = stockActual - cantidadMerma;
-                if (nuevoStock < 0) {
+                if (cantidadMerma > stockActual) {
                     throw new IllegalArgumentException(
-                        "Stock insuficiente para registrar merma de " + cantidadMerma +
-                        " unidades del producto " + producto.getDescripcion());
+                            "No se puede registrar merma de " + cantidadMerma +
+                                    " unidades del producto " + producto.getDescripcion() +
+                                    " porque solo hay " + stockActual + " en inventario");
                 }
+
+                // 3) Restar stock del producto
+                int nuevoStock = stockActual - cantidadMerma;
                 producto.setCantidad(nuevoStock);
                 productoRepository.save(producto);
 
-                // 2) Consumir lotes FIFO en compra_productos
+                // 4) Consumir lotes FIFO en compra_productos
                 List<CompraProducto> lotes = compraProductoRepository
-                    .findByProductoIdOrderByFechaCompraAsc(prodId);
+                        .findByProductoIdOrderByFechaCompraAsc(prodId);
 
                 int restante = cantidadMerma;
                 float costoTotalMerma = 0f;
 
                 for (CompraProducto lote : lotes) {
-                    if (restante <= 0) break;
+                    if (restante <= 0)
+                        break;
 
-                    int disponible = lote.getCantidadDisponible() == null
-                            ? 0 : lote.getCantidadDisponible();
-                    if (disponible <= 0) continue;
+                    Integer disponibleObj = lote.getCantidadDisponible();
+                    int disponible = (disponibleObj == null) ? 0 : disponibleObj;
+                    if (disponible <= 0)
+                        continue;
 
                     int aConsumir = Math.min(disponible, restante);
                     lote.setCantidadDisponible(disponible - aConsumir);
                     restante -= aConsumir;
 
-                    float precioCompra = lote.getPrecioCompra() == null
-                            ? 0f : lote.getPrecioCompra();
+                    Float precioCompraObj = lote.getPrecioCompra();
+                    float precioCompra = (precioCompraObj == null) ? 0f : precioCompraObj;
+
                     costoTotalMerma += aConsumir * precioCompra;
                 }
 
@@ -150,13 +153,59 @@ public class MermaServiceImpl implements MermaService {
 
                 if (restante > 0) {
                     throw new IllegalStateException(
-                        "Stock inconsistente: no hay suficiente en compra_productos para merma del producto " + prodId);
+                            "Stock inconsistente: no hay suficiente en compra_productos para merma del producto "
+                                    + prodId);
                 }
 
+                // 5) Guardar costo total en el detalle
                 mp.setCostoTotal(costoTotalMerma);
+                totalMerma += costoTotalMerma;
             }
         }
 
+        // 6) Guardar total en cabecera (si existe la columna costo_total en merma)
+        merma.setCostoTotal(totalMerma);
+
         return mermaRepository.save(merma);
     }
+
+    @Override
+    public float calcularCostoMermaProducto(Integer productoId, Integer cantidad) {
+        if (cantidad == null || cantidad <= 0) {
+            throw new IllegalArgumentException("Cantidad debe ser mayor a cero");
+        }
+
+        List<CompraProducto> lotes = compraProductoRepository
+                .findByProductoIdOrderByFechaCompraAsc(productoId);
+
+        int restante = cantidad;
+        float costoTotal = 0f;
+
+        for (CompraProducto lote : lotes) {
+            if (restante <= 0)
+                break;
+
+            Integer disponibleObj = lote.getCantidadDisponible();
+            int disponible = (disponibleObj == null) ? 0 : disponibleObj;
+            if (disponible <= 0)
+                continue;
+
+            int aConsumir = Math.min(disponible, restante);
+            restante -= aConsumir;
+
+            Float precioObj = lote.getPrecioCompra();
+            float precio = (precioObj == null) ? 0f : precioObj;
+
+            costoTotal += aConsumir * precio;
+        }
+
+        if (restante > 0) {
+            throw new IllegalArgumentException(
+                    "No hay suficiente inventario por lotes para calcular costo de merma (faltan "
+                            + restante + " unidades)");
+        }
+
+        return costoTotal;
+    }
+
 }

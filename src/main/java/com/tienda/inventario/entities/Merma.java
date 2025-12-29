@@ -23,13 +23,9 @@ public class Merma {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // fecha de registro de la merma (puede ser nullable si quieres)
+    // Fecha de registro
     @Column(name = "fecha")
     private LocalDateTime fecha;
-
-    // fecha efectiva de salida de los productos, NOT NULL
-    @Column(name = "fecha_salida", nullable = false)
-    private LocalDateTime fechaSalida;
 
     // tipo de merma: "CADUCIDAD", "ROBO", "ROTURA", etc.
     @Column(name = "tipo_merma")
@@ -38,6 +34,10 @@ public class Merma {
     // descripción general opcional
     @Column(name = "motivo_general")
     private String motivoGeneral;
+
+    // Opcional: total de la merma (si creaste la columna en BD)
+    @Column(name = "costo_total")
+    private Float costoTotal;
 
     @OneToMany(mappedBy = "merma", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -49,7 +49,6 @@ public class Merma {
     public Merma(LocalDateTime fecha, LocalDateTime fechaSalida,
             String tipoMerma, String motivoGeneral) {
         this.fecha = fecha;
-        this.fechaSalida = fechaSalida;
         this.tipoMerma = tipoMerma;
         this.motivoGeneral = motivoGeneral;
     }
@@ -70,14 +69,6 @@ public class Merma {
         this.fecha = fecha;
     }
 
-    public LocalDateTime getFechaSalida() {
-        return fechaSalida;
-    }
-
-    public void setFechaSalida(LocalDateTime fechaSalida) {
-        this.fechaSalida = fechaSalida;
-    }
-
     public String getTipoMerma() {
         return tipoMerma;
     }
@@ -92,6 +83,14 @@ public class Merma {
 
     public void setMotivoGeneral(String motivoGeneral) {
         this.motivoGeneral = motivoGeneral;
+    }
+
+    public Float getCostoTotal() {
+        return costoTotal;
+    }
+
+    public void setCostoTotal(Float costoTotal) {
+        this.costoTotal = costoTotal;
     }
 
     public List<MermaProducto> getMermaProductos() {

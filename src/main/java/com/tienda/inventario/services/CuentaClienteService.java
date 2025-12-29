@@ -2,6 +2,8 @@ package com.tienda.inventario.services;
 
 import java.util.List;
 
+import com.tienda.inventario.dto.CuentaClienteDetallesDto;
+import com.tienda.inventario.dto.CuentaClienteResumenDto;
 import com.tienda.inventario.entities.CuentaCliente;
 
 public interface CuentaClienteService {
@@ -19,4 +21,8 @@ public interface CuentaClienteService {
     List<CuentaCliente> cuentasConDeuda();
 
     List<CuentaCliente> cuentasSinDeudaONegro();
+    
+    // ✅ MANTENER SOLO 2 métodos nuevos
+    List<CuentaClienteResumenDto> resumenCompleto();
+    CuentaClienteDetallesDto getDetallesById(Long id);
 }

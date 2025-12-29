@@ -1,13 +1,17 @@
 package com.tienda.inventario.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tienda.inventario.dto.VentaProductoResumenDto;
 import com.tienda.inventario.entities.Venta;
 import com.tienda.inventario.entities.VentaProducto;
 import com.tienda.inventario.repositories.VentaProductoRepository;
@@ -42,5 +46,17 @@ public class VentaProductoController {
         }
         List<VentaProducto> detalles = ventaService.productosDeVenta(venta);
         return ResponseEntity.ok(detalles);
+    }
+
+    @GetMapping("/reportes/ventas-por-producto")
+    public List<VentaProductoResumenDto> ventasPorProducto(
+            @RequestParam("desde")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate desde,
+            @RequestParam("hasta")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate hasta
+    ) {
+        return ventaService.obtenerVentasPorProducto(desde, hasta);
     }
 }

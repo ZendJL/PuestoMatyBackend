@@ -1,11 +1,11 @@
 package com.tienda.inventario.entities;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -28,37 +29,27 @@ public class VentaProducto {
     @JsonIgnore
     private Venta venta;
 
-    @JsonProperty("venta")
-    public Map<String, Object> getVentaResumen() {
-        if (venta == null)
-            return null;
-        Map<String, Object> m = new HashMap<>();
-        m.put("id", venta.getId());
-        m.put("fecha", venta.getFecha());
-        return m;
-    }
-
     @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
+    @Column(name = "cantidad")
     private Integer cantidad;
+
+    @Column(name = "precio_unitario")
     private Float precioUnitario;
 
-    // Nuevo: costo total (según FIFO) de esta línea
+    @Column(name = "importe")
+    private Float importe;
+
     @Column(name = "costo_total")
     private Float costoTotal;
 
-    public VentaProducto() {
-    }
+    // NUEVA RELACIÓN: lotes consumidos de esta línea
+    @OneToMany(mappedBy = "ventaProducto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VentaProductoLote> lotesConsumidos = new ArrayList<>();
 
-    public VentaProducto(Venta venta, Producto producto,
-                         Integer cantidad, Float precioUnitario) {
-        this.venta = venta;
-        this.producto = producto;
-        this.cantidad = cantidad;
-        this.precioUnitario = precioUnitario;
-    }
+    public VentaProducto() {}
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
@@ -75,6 +66,14 @@ public class VentaProducto {
     public Float getPrecioUnitario() { return precioUnitario; }
     public void setPrecioUnitario(Float precioUnitario) { this.precioUnitario = precioUnitario; }
 
+    public Float getImporte() { return importe; }
+    public void setImporte(Float importe) { this.importe = importe; }
+
     public Float getCostoTotal() { return costoTotal; }
     public void setCostoTotal(Float costoTotal) { this.costoTotal = costoTotal; }
+
+    public List<VentaProductoLote> getLotesConsumidos() { return lotesConsumidos; }
+    public void setLotesConsumidos(List<VentaProductoLote> lotesConsumidos) {
+        this.lotesConsumidos = lotesConsumidos;
+    }
 }

@@ -1,8 +1,10 @@
 package com.tienda.inventario.services;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.tienda.inventario.dto.VentaProductoResumenDto;
 import com.tienda.inventario.entities.Venta;
 import com.tienda.inventario.entities.VentaProducto;
 
@@ -22,9 +24,9 @@ public interface VentaService {
 
     List<VentaProducto> productosDeVenta(Venta venta);
 
-     //Venta crearVentaConProductos(Venta venta, List<Integer> productosIds, Float cantidad);
-// VentaService
-Venta crearVentaConProductos(Venta venta);
+    Venta crearVentaConProductos(Venta venta);
 
-    
+    List<Object[]> costosPorLotesDeVenta(Integer ventaId);
+
+    List<VentaProductoResumenDto> obtenerVentasPorProducto(LocalDate desde, LocalDate hasta);
 }

@@ -1,22 +1,29 @@
 package com.tienda.inventario.services.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tienda.inventario.dto.VentaProductoResumenDto;
 import com.tienda.inventario.entities.CompraProducto;
 import com.tienda.inventario.entities.CuentaCliente;
 import com.tienda.inventario.entities.Producto;
 import com.tienda.inventario.entities.Venta;
 import com.tienda.inventario.entities.VentaProducto;
+import com.tienda.inventario.entities.VentaProductoLote;
 import com.tienda.inventario.repositories.CompraProductoRepository;
 import com.tienda.inventario.repositories.ProductoRepository;
+import com.tienda.inventario.repositories.VentaProductoLoteRepository;
 import com.tienda.inventario.repositories.VentaProductoRepository;
 import com.tienda.inventario.repositories.VentaRepository;
 import com.tienda.inventario.services.CuentaClienteService;
 import com.tienda.inventario.services.VentaService;
+
 
 @Service
 @Transactional
@@ -27,17 +34,20 @@ public class VentaServiceImpl implements VentaService {
     private final ProductoRepository productoRepository;
     private final CuentaClienteService cuentaClienteService;
     private final CompraProductoRepository compraProductoRepository;
+    private final VentaProductoLoteRepository ventaProductoLoteRepository;
 
     public VentaServiceImpl(VentaRepository ventaRepository,
                             VentaProductoRepository ventaProductoRepository,
                             ProductoRepository productoRepository,
                             CuentaClienteService cuentaClienteService,
-                            CompraProductoRepository compraProductoRepository) {
+                            CompraProductoRepository compraProductoRepository,
+                            VentaProductoLoteRepository ventaProductoLoteRepository) {
         this.ventaRepository = ventaRepository;
         this.ventaProductoRepository = ventaProductoRepository;
         this.productoRepository = productoRepository;
         this.cuentaClienteService = cuentaClienteService;
         this.compraProductoRepository = compraProductoRepository;
+        this.ventaProductoLoteRepository = ventaProductoLoteRepository;
     }
 
     @Override
@@ -81,7 +91,6 @@ public class VentaServiceImpl implements VentaService {
     public Venta crearVentaConProductos(Venta venta) {
         venta.setFecha(LocalDateTime.now());
 
-        // Resolver cuenta si viene solo cuentaId
         if (venta.getCuenta() == null && venta.getCuentaId() != null) {
             CuentaCliente cuenta = cuentaClienteService.buscarPorId(venta.getCuentaId());
             venta.setCuenta(cuenta);
@@ -94,18 +103,15 @@ public class VentaServiceImpl implements VentaService {
                 Producto producto = productoRepository.findById(prodId)
                         .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + prodId));
 
-                // Enlazar relaciones
                 vp.setVenta(venta);
                 vp.setProducto(producto);
 
-                // Si no viene precioUnitario, tomar el actual
                 if (vp.getPrecioUnitario() == null) {
                     vp.setPrecioUnitario(producto.getPrecio());
                 }
 
-                int cantidadVendida = vp.getCantidad();
+                int cantidadVendida = vp.getCantidad() == null ? 0 : vp.getCantidad();
 
-                // 1) Restar stock total del producto
                 Integer stockActual = producto.getCantidad() == null ? 0 : producto.getCantidad();
                 int nuevaCantidad = stockActual - cantidadVendida;
                 if (nuevaCantidad < 0) {
@@ -115,7 +121,6 @@ public class VentaServiceImpl implements VentaService {
                 producto.setCantidad(nuevaCantidad);
                 productoRepository.save(producto);
 
-                // 2) Consumir lotes de compra_productos por FIFO y calcular costoTotal
                 List<CompraProducto> lotes = compraProductoRepository
                         .findByProductoIdOrderByFechaCompraAsc(prodId);
 
@@ -135,23 +140,31 @@ public class VentaServiceImpl implements VentaService {
 
                     float precioCompra = lote.getPrecioCompra() == null
                             ? 0f : lote.getPrecioCompra();
-                    costoTotal += aConsumir * precioCompra;
+                    float costoParcial = aConsumir * precioCompra;
+                    costoTotal += costoParcial;
+
+                    VentaProductoLote vpl = new VentaProductoLote();
+                    vpl.setVentaProducto(vp);
+                    vpl.setCompraProducto(lote);
+                    vpl.setCantidadConsumida(aConsumir);
+                    vpl.setCostoUnitario(precioCompra);
+                    vpl.setCostoTotal(costoParcial);
+                    vpl.setFechaConsumo(venta.getFecha());
+
+                    vp.getLotesConsumidos().add(vpl);
                 }
 
-                compraProductoRepository.saveAll(lotes);
-
-                // Si por algún bug quedara restante > 0, significa que no había stock en lotes;
-                // aquí podrías lanzar excepción o ignorar. De momento lanzamos:
                 if (restante > 0) {
                     throw new IllegalStateException(
                         "Stock inconsistente: no hay suficiente en compra_productos para el producto " + prodId);
                 }
 
                 vp.setCostoTotal(costoTotal);
+
+                compraProductoRepository.saveAll(lotes);
             }
         }
 
-        // 3) Actualizar saldo si es PRESTAMO
         if ("PRESTAMO".equalsIgnoreCase(venta.getStatus()) && venta.getCuenta() != null) {
             CuentaCliente cuenta = venta.getCuenta();
             Float saldoActual = cuenta.getSaldo() == null ? 0f : cuenta.getSaldo();
@@ -160,5 +173,37 @@ public class VentaServiceImpl implements VentaService {
         }
 
         return ventaRepository.save(venta);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Object[]> costosPorLotesDeVenta(Integer ventaId) {
+        Venta venta = ventaRepository.findById(ventaId)
+            .orElseThrow(() -> new IllegalArgumentException("Venta no encontrada: " + ventaId));
+
+        List<VentaProductoLote> lotes = ventaProductoLoteRepository.findByVentaProducto_Venta(venta);
+        List<Object[]> resultado = new ArrayList<>();
+
+        for (VentaProductoLote vpl : lotes) {
+            Object[] fila = new Object[7];
+            fila[0] = vpl.getVentaProducto().getProducto().getId();
+            fila[1] = vpl.getVentaProducto().getProducto().getDescripcion();
+            fila[2] = vpl.getCompraProducto().getId();
+            fila[3] = vpl.getCompraProducto().getFechaCompra();
+            fila[4] = vpl.getCantidadConsumida();
+            fila[5] = vpl.getCostoUnitario();
+            fila[6] = vpl.getCostoTotal();
+            resultado.add(fila);
+        }
+
+        return resultado;
+    }
+
+     @Override
+    @Transactional(readOnly = true)
+    public List<VentaProductoResumenDto> obtenerVentasPorProducto(LocalDate desde, LocalDate hasta) {
+        LocalDateTime ini = desde.atStartOfDay();
+        LocalDateTime fin = hasta.atTime(LocalTime.MAX);
+        return ventaProductoRepository.resumenPorProducto(ini, fin);
     }
 }

@@ -11,23 +11,23 @@ public interface MermaService {
 
     Merma guardar(Merma merma);
 
-    Merma buscarPorId(Integer id);
+    Merma crearMermaConProductos(Merma merma);
 
-    //List<Merma> listarTodas();
-    
     List<Merma> listar();
+
+    Merma buscarPorId(Integer id);
 
     void eliminar(Integer id);
 
-    public List<MermaProducto> mermasDeProducto(Producto producto);
+    List<MermaProducto> mermasDeProducto(Producto producto);
 
-    List<Merma> mermasPorTipoYRango(String tipoMerma, LocalDateTime desde, LocalDateTime hasta);
+    List<Merma> mermasPorTipoYRango(String tipoMerma,
+                                    LocalDateTime desde,
+                                    LocalDateTime hasta);
 
-    List<Merma> mermasEntreFechas(LocalDateTime desde, LocalDateTime hasta);
+    List<Merma> mermasEntreFechas(LocalDateTime desde,
+                                  LocalDateTime hasta);
 
-    /**
-     * Crea una merma con sus productos, restando stock por FIFO desde compra_productos.
-     * Se asume que la Merma llega con la lista mermaProductos llena (producto + cantidad).
-     */
-    Merma crearMermaConProductos(Merma merma);
+    // NUEVO: costo estimado FIFO sin modificar BD
+    float calcularCostoMermaProducto(Integer productoId, Integer cantidad);
 }

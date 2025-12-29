@@ -12,4 +12,5 @@ public interface CompraProductoRepository extends JpaRepository<CompraProducto, 
     List<CompraProducto> findByProductoIdOrderByFechaCompraAsc(Integer productoId);
      // último lote (mayor fecha_compra)
     Optional<CompraProducto> findTopByProductoIdOrderByFechaCompraDesc(Integer productoId);
+    
 }
