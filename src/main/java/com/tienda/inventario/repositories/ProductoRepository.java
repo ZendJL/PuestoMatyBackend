@@ -23,5 +23,8 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 @Query("select p.precio from Producto p where p.id = :id")
 Float findPrecioById(@Param("id") Integer id);
 
+// ✅ BATCH productos
+    @Override
+List<Producto> findAllById(Iterable<Integer> ids);
 
 }

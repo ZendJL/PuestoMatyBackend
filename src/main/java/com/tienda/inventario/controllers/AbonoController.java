@@ -2,6 +2,7 @@ package com.tienda.inventario.controllers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -78,4 +79,18 @@ public class AbonoController {
         return abonoService.abonosEntreFechas(desde, hasta);
     }
     
+    // ✅ NUEVO: Abonar + crear Abono (POST)
+    @PostMapping("/{cuentaId}/abonar")
+    public ResponseEntity<Abono> abonarACuenta(@PathVariable Integer cuentaId, @RequestParam Float monto) {
+        Abono abono = abonoService.abonarACuenta(cuentaId, monto);
+        return ResponseEntity.ok(abono);
+    }
+
+    // ✅ NUEVO: Recibo abono (GET)
+    @GetMapping("/{abonoId}/recibo")
+    public ResponseEntity<Map<String, Object>> obtenerReciboAbono(@PathVariable Integer abonoId) {
+        Map<String, Object> recibo = abonoService.generarReciboAbono(abonoId);
+        return ResponseEntity.ok(recibo);
+    }
 }
+

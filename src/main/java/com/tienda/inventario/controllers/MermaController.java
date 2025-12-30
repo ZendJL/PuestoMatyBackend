@@ -2,6 +2,7 @@ package com.tienda.inventario.controllers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tienda.inventario.dto.MermaCostoRequestDto;
 import com.tienda.inventario.entities.Merma;
+import com.tienda.inventario.repositories.MermaRepository;
 import com.tienda.inventario.services.MermaService;
 
 @RestController
@@ -23,9 +26,12 @@ import com.tienda.inventario.services.MermaService;
 public class MermaController {
 
     private final MermaService mermaService;
+    private final MermaRepository mermaRepository;
+    
 
-    public MermaController(MermaService mermaService) {
+    public MermaController(MermaService mermaService,MermaRepository mermaRepository) {
         this.mermaService = mermaService;
+        this.mermaRepository = mermaRepository;
     }
 
     @GetMapping
@@ -91,5 +97,35 @@ public class MermaController {
         float costo = mermaService.calcularCostoMermaProducto(productoId, cantidad);
         return ResponseEntity.ok(costo);
     }
+
+    // ✅ REPORTES OPTIMIZADOS (1 query cada uno)
+// ✅ REPORTE OPTIMIZADO (agregar al final)
+// ✅ AGREGAR filtros en reporte:
+@GetMapping("/reporte")
+public ResponseEntity<List<Map<String, Object>>> reporteMermas(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta,
+        @RequestParam(required = false) String tipo) {
+    
+    LocalDateTime dDesde = desde.withHour(0).withMinute(0).withSecond(0);
+    LocalDateTime dHasta = hasta.withHour(23).withMinute(59).withSecond(59);
+    
+    List<Map<String, Object>> reporte;
+    if (tipo != null && !tipo.isEmpty()) {
+        reporte = mermaService.reporteMermasPorTipoCompleto(dDesde, dHasta, tipo); // ✅ 1 QUERY
+    } else {
+        reporte = mermaService.reporteMermasCompleto(dDesde, dHasta); // ✅ 1 QUERY
+    }
+    return ResponseEntity.ok(reporte);
+}
+
+
+@PostMapping("/costos-batch")
+    public ResponseEntity<List<Float>> costosMermaBatch(
+            @RequestBody List<MermaCostoRequestDto> requests) {  // ✅ List genérico
+        List<Float> costos = mermaService.calcularCostosMermaBatch(requests);
+        return ResponseEntity.ok(costos);
+    }
+
 
 }

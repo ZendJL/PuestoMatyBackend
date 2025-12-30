@@ -1,9 +1,7 @@
 package com.tienda.inventario.services.impl;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -15,6 +13,7 @@ import com.tienda.inventario.dto.CuentaClienteDetallesDto;
 import com.tienda.inventario.dto.CuentaClienteResumenDto;
 import com.tienda.inventario.dto.VentaClienteDto;
 import com.tienda.inventario.entities.CuentaCliente;
+import com.tienda.inventario.repositories.AbonoRepository;
 import com.tienda.inventario.repositories.CuentaClienteRepository;
 import com.tienda.inventario.services.CuentaClienteService;
 
@@ -25,9 +24,11 @@ import jakarta.persistence.EntityNotFoundException;
 public class CuentaClienteServiceImpl implements CuentaClienteService {
 
     private final CuentaClienteRepository cuentaClienteRepository;
+    private final AbonoRepository abonoRepository;
 
-    public CuentaClienteServiceImpl(CuentaClienteRepository cuentaClienteRepository) {
+    public CuentaClienteServiceImpl(CuentaClienteRepository cuentaClienteRepository, AbonoRepository abonoRepository) {
         this.cuentaClienteRepository = cuentaClienteRepository;
+        this.abonoRepository = abonoRepository;
     }
 
     // ✅ MÉTODOS ORIGINALES (mantener intactos)
@@ -174,4 +175,5 @@ public CuentaClienteDetallesDto getDetallesById(Long id) {
             ((Number) row[5]).doubleValue()
         );
     }
+
 }

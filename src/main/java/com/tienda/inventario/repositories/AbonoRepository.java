@@ -26,4 +26,7 @@ public interface AbonoRepository extends JpaRepository<Abono, Integer> {
      @Query("SELECT a FROM Abono a WHERE a.cuenta = :cuenta")
     List<Abono> findByCuentaCliente(@Param("cuenta") CuentaCliente cuenta);
 
+    Abono findById(Long abonoID);
+    Abono findById(int abonoID);
+
 }

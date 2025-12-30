@@ -1,5 +1,6 @@
 package com.tienda.inventario.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,13 +19,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tienda.inventario.dto.CuentaClienteDetallesDto;
 import com.tienda.inventario.dto.CuentaClienteResumenDto;
 import com.tienda.inventario.dto.CuentaResumenDto;
-import com.tienda.inventario.entities.Abono; // ✅ AGREGADO
+import com.tienda.inventario.entities.Abono;
 import com.tienda.inventario.entities.CuentaCliente;
-import com.tienda.inventario.entities.VentaCliente;
-import com.tienda.inventario.services.AbonoService; // ✅ AGREGADO
+import com.tienda.inventario.entities.VentaCliente; // ✅ AGREGADO
+import com.tienda.inventario.services.AbonoService;
 import com.tienda.inventario.services.CuentaClienteService;
-import com.tienda.inventario.services.VentaClienteService;
+import com.tienda.inventario.services.VentaClienteService; // ✅ AGREGADO
 import com.tienda.inventario.services.VentaService;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @RestController
 @RequestMapping("/api/cuentas")
@@ -186,4 +190,66 @@ public class CuentaClienteController {
 
         return ResponseEntity.ok(resumen);
     }
+    
+   @RestController
+@RequestMapping("/api/cuentas")
+@CrossOrigin(origins = "http://localhost:5173")
+public class CuentaController {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @GetMapping("/optimizadas-pos")
+    public ResponseEntity<List<CuentaClienteDetallesDto>> getCuentasOptimizadasPos() {
+        try {
+            // ✅ 1 SOLA QUERY con todos los JOINs
+            String sql = """
+                SELECT 
+                    cc.id, cc.nombre, cc.descripcion, cc.saldo,
+                    COALESCE(SUM(a.cantidad), 0) as total_abonos,
+                    COALESCE(COUNT(vc.id), 0) as total_ventas,
+                    COALESCE(SUM(v.total), 0) as total_facturado,
+                    COALESCE(SUM(a.cantidad), 0) as total_pagado,
+                    COALESCE(cc.saldo, 0) as deuda_pendiente,
+                    NULL as abono_id, NULL as abono_fecha, NULL as abono_cantidad,  -- ultimosAbonos
+                    NULL as venta_id, NULL as venta_fecha, NULL as venta_total     -- ultimasVentas
+                FROM cuenta_cliente cc
+                LEFT JOIN abonos a ON a.cuenta_id = cc.id
+                LEFT JOIN ventas_cliente vc ON vc.cuenta_id = cc.id
+                LEFT JOIN ventas v ON v.id = vc.venta_id
+                GROUP BY cc.id, cc.nombre, cc.descripcion, cc.saldo
+                ORDER BY cc.nombre
+            """;
+
+            List<Object[]> rows = entityManager.createNativeQuery(sql).getResultList();
+            
+            // ✅ Transformar a tu DTO (SIN listas detalladas para POS)
+            List<CuentaClienteDetallesDto> cuentas = new ArrayList<>();
+            
+            for (Object[] row : rows) {
+                CuentaClienteDetallesDto dto = new CuentaClienteDetallesDto(
+                    ((Number) row[0]).longValue(),           // id
+                    (String) row[1],                        // nombre
+                    (String) row[2],                        // descripcion
+                    ((Number) row[3]).floatValue(),         // saldo
+                    ((Number) row[4]).doubleValue(),        // totalAbonos
+                    ((Long) row[5]).intValue(),             // totalVentas
+                    ((Number) row[6]).doubleValue(),        // totalFacturado
+                    ((Number) row[7]).doubleValue(),        // totalPagado
+                    ((Number) row[8]).doubleValue(),        // deudaPendiente
+                    new ArrayList<>(),                      // ultimosAbonos (vacío)
+                    new ArrayList<>()                       // ultimasVentas (vacío)
+                );
+                cuentas.add(dto);
+            }
+            
+            return ResponseEntity.ok(cuentas);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new ArrayList<>());
+        }
+    }
+}
+
 }

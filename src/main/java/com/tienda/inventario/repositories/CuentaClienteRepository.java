@@ -63,4 +63,21 @@ List<Object[]> ultimosAbonosByCuenta(@Param("cuentaId") Long cuentaId);
         ORDER BY v.fecha DESC 
         """, nativeQuery = true)
     List<Object[]> ultimasVentasByCuenta(@Param("cuentaId") Long cuentaId);
+
+    @Query(value = """
+    SELECT 
+        c.id, c.nombre, c.descripcion,
+        COUNT(v.id) as total_ventas,
+        COALESCE(SUM(v.total), 0) as total_facturado,
+        COALESCE(SUM(va.cantidad), 0) as total_pagado,
+        COALESCE(SUM(v.total) - COALESCE(SUM(va.cantidad), 0), 0) as saldo,
+        GROUP_CONCAT(v.id ORDER BY v.fecha DESC SEPARATOR ',') as ultimas_ventas_ids
+    FROM cuenta_cliente c 
+    LEFT JOIN ventas v ON v.cuenta_id = c.id AND v.status = 'PRESTAMO'
+    LEFT JOIN venta_abonos va ON va.venta_id = v.id
+    GROUP BY c.id, c.nombre, c.descripcion
+    HAVING saldo > 0
+    ORDER BY saldo DESC
+    """, nativeQuery = true)
+List<Object[]> resumenCuentasDeudores();
 }

@@ -37,4 +37,18 @@ List<VentaProductoResumenDto> resumenPorProducto(
         @Param("desde") LocalDateTime desde,
         @Param("hasta") LocalDateTime hasta
 );
+
+@Query(value = """
+    SELECT 
+        p.id, p.descripcion, 
+        cp.id, cp.fecha_compra,
+        vpl.cantidad_consumida, vpl.costo_unitario, vpl.costo_total
+    FROM venta_producto_lote vpl
+    JOIN venta_producto vp ON vp.id = vpl.venta_producto_id
+    JOIN productos p ON p.id = vp.producto_id
+    JOIN compra_producto cp ON cp.id = vpl.compra_producto_id
+    WHERE vp.venta_id = :ventaId
+    ORDER BY p.descripcion, cp.fecha_compra
+    """, nativeQuery = true)
+List<Object[]> findCostosPorLotesDeVenta(@Param("ventaId") Integer ventaId);
 }

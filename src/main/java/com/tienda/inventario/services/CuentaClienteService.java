@@ -25,4 +25,5 @@ public interface CuentaClienteService {
     // ✅ MANTENER SOLO 2 métodos nuevos
     List<CuentaClienteResumenDto> resumenCompleto();
     CuentaClienteDetallesDto getDetallesById(Long id);
+
 }
