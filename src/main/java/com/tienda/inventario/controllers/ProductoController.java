@@ -2,8 +2,17 @@ package com.tienda.inventario.controllers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -124,5 +133,86 @@ public class ProductoController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta) {
         return productoService.productosCompradosEnRango(desde, hasta);
+    }
+     /**
+     * ⭐ NUEVO ENDPOINT PARA IMPRIMIR CÓDIGO DE BARRAS
+     * Ruta: /api/impresora/codigo-barras
+     */
+    @PostMapping("/impresora/codigo-barras")
+    public ResponseEntity<?> imprimirCodigoBarras(@RequestBody Map<String, String> datos) {
+        String codigo = datos.get("codigo");
+        String descripcion = datos.getOrDefault("descripcion", "");
+
+        if (codigo == null || codigo.trim().isEmpty()) {
+            return ResponseEntity.badRequest()
+                .body("{\"error\":\"Código requerido\"}");
+        }
+
+        try {
+            imprimirTicketCodigoBarras(codigo, descripcion);
+            return ResponseEntity.ok()
+                .body("{\"success\":\"Código de barras impreso correctamente\"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("{\"error\":\"Error al imprimir: " + e.getMessage() + "\"}");
+        }
+    }
+    /**
+     * ⭐ FUNCIÓN INTERNA para generar e imprimir ticket de código de barras
+     */
+    private void imprimirTicketCodigoBarras(String codigo, String descripcion) throws Exception {
+        StringBuilder comandos = new StringBuilder();
+        
+        // ⭐ INICIALIZAR IMPRESORA (ESC @)
+        comandos.append((char) 27).append((char) 64);
+        
+        // ⭐ CENTRAR TEXTO (ESC a 1)
+        comandos.append((char) 27).append((char) 97).append((char) 1);
+        
+        // ⭐ TÍTULO - Negrita ON
+        comandos.append((char) 27).append((char) 69).append((char) 1); // Negrita ON
+        comandos.append("CÓDIGO DE BARRAS\n");
+        comandos.append((char) 27).append((char) 69).append((char) 0); // Negrita OFF
+        
+        // ⭐ DESCRIPCIÓN DEL PRODUCTO
+        if (!descripcion.trim().isEmpty()) {
+            comandos.append(descripcion).append("\n");
+        }
+        
+        // ⭐ CÓDIGO DE BARRAS CODE128 (GS k 73)
+        comandos.append((char) 29).append((char) 107).append((char) 73); // GS k 73 (CODE128)
+        comandos.append((char) codigo.length()); // Longitud del código
+        comandos.append(codigo); // Datos del código
+        
+        // ⭐ NUEVA LÍNEA después del barcode
+        comandos.append("\n\n");
+        
+        // ⭐ CÓDIGO EN TEXTO - Doble altura + Negrita
+        comandos.append((char) 29).append((char) 33).append((char) 16); // Doble altura
+        comandos.append((char) 27).append((char) 69).append((char) 1); // Negrita ON
+        comandos.append(codigo).append("\n");
+        comandos.append((char) 27).append((char) 69).append((char) 0); // Negrita OFF
+        comandos.append((char) 29).append((char) 33).append((char) 0); // Normal
+        
+        // ⭐ SEPARADOR
+        comandos.append("\n----------------------------------------\n");
+        comandos.append("Tienda - ").append(LocalDateTime.now().toLocalDate()).append("\n");
+        
+        // ⭐ CORTAR PAPEL (GS V 1)
+        comandos.append("\n\n");
+        comandos.append((char) 29).append((char) 86).append((char) 1);
+        
+        // Convertir a bytes
+        byte[] bytesComandos = comandos.toString().getBytes("UTF-8");
+        
+        // ⭐ ENVIAR A IMPRESORA POR DEFECTO
+        PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
+        if (printService == null) {
+            throw new Exception("No se encontró impresora por defecto");
+        }
+        
+        DocPrintJob job = printService.createPrintJob();
+        Doc doc = new SimpleDoc(bytesComandos, DocFlavor.BYTE_ARRAY.AUTOSENSE, null);
+        job.print(doc, null);
     }
 }
