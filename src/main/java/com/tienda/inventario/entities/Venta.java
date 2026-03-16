@@ -3,9 +3,13 @@ package com.tienda.inventario.entities;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.tienda.inventario.enums.TipoPago;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,13 +43,14 @@ public class Venta {
     private Float pagoCliente;
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
-@com.fasterxml.jackson.annotation.JsonManagedReference
-private List<VentaProducto> ventaProductos;
+    @com.fasterxml.jackson.annotation.JsonManagedReference
+    private List<VentaProducto> ventaProductos;
 
     @OneToMany(mappedBy = "venta")
     private List<VentaCliente> ventasCliente;
-
-    
+    @Column(name = "tipo_pago")
+    @Enumerated(EnumType.STRING)
+    private TipoPago tipoPago = TipoPago.PESOS;
 
     public Venta() {
     }
@@ -63,7 +68,7 @@ private List<VentaProducto> ventaProductos;
     }
 
     public Integer getId() {
-    return id;
+        return id;
     }
 
     public void setId(Integer id) {
@@ -126,7 +131,6 @@ private List<VentaProducto> ventaProductos;
         this.ventasCliente = ventasCliente;
     }
 
-
     public Float getPagoCliente() {
         return pagoCliente;
     }
@@ -135,5 +139,12 @@ private List<VentaProducto> ventaProductos;
         this.pagoCliente = pagoCliente;
     }
 
+    public TipoPago getTipoPago() {
+        return tipoPago;
+    }
+
+    public void setTipoPago(TipoPago tipoPago) {
+        this.tipoPago = tipoPago;
+    }
 
 }
