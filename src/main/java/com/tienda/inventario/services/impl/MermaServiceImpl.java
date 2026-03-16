@@ -149,9 +149,10 @@ public Merma crearMermaConProductos(Merma merma) {
             Integer stockActualObj = producto.getCantidad();
             int stockActual = stockActualObj == null ? 0 : stockActualObj;
             if (cantidadMerma > stockActual) {
-                throw new IllegalArgumentException(String.format(
+               // throw new IllegalArgumentException(String.format(
+               System.err.print((String.format(
                     "Sin stock: %d/%d und %s", cantidadMerma, stockActual, producto.getDescripcion()
-                ));
+                )));
             }
 
             // 3) Restar stock
@@ -179,7 +180,8 @@ public Merma crearMermaConProductos(Merma merma) {
             }
 
             if (restante > 0) {
-                throw new IllegalStateException("Lotes insuficientes para producto " + prodId);
+                System.err.print(("Lotes insuficientes para producto " + prodId));
+                //throw new IllegalStateException("Lotes insuficientes para producto " + prodId);
             }
 
             // 5) Asignar costo
