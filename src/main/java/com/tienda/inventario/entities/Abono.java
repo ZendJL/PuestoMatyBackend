@@ -36,6 +36,9 @@ public class Abono {
     @Column(name = "nuevo_saldo", nullable = false)
     private Float nuevoSaldo;
 
+    @Column(name = "tipo_pago", length = 20)
+    private String tipoPago = "PESOS";
+
     @com.fasterxml.jackson.annotation.JsonProperty("cuentaId")
     public Integer getCuentaId() {
         return cuenta != null ? cuenta.getId() : null;
@@ -53,53 +56,24 @@ public class Abono {
         this.nuevoSaldo = nuevoSaldo;
     }
 
-    public Integer getId() {
-        return id;
-    }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    public LocalDateTime getFecha() { return fecha; }
+    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
 
-    public LocalDateTime getFecha() {
-        return fecha;
-    }
+    public CuentaCliente getCuenta() { return cuenta; }
+    public void setCuenta(CuentaCliente cuenta) { this.cuenta = cuenta; }
 
-    public void setFecha(LocalDateTime fecha) {
-        this.fecha = fecha;
-    }
+    public Float getCantidad() { return cantidad; }
+    public void setCantidad(Float cantidad) { this.cantidad = cantidad; }
 
-    public CuentaCliente getCuenta() {
-        return cuenta;
-    }
+    public Float getViejoSaldo() { return viejoSaldo; }
+    public void setViejoSaldo(Float viejoSaldo) { this.viejoSaldo = viejoSaldo; }
 
-    public void setCuenta(CuentaCliente cuenta) {
-        this.cuenta = cuenta;
-    }
+    public Float getNuevoSaldo() { return nuevoSaldo; }
+    public void setNuevoSaldo(Float nuevoSaldo) { this.nuevoSaldo = nuevoSaldo; }
 
-    public Float getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(Float cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public Float getViejoSaldo() {
-        return viejoSaldo;
-    }
-
-    public void setViejoSaldo(Float viejoSaldo) {
-        this.viejoSaldo = viejoSaldo;
-    }
-
-    public Float getNuevoSaldo() {
-        return nuevoSaldo;
-    }
-
-    public void setNuevoSaldo(Float nuevoSaldo) {
-        this.nuevoSaldo = nuevoSaldo;
-    }
-
-    
+    public String getTipoPago() { return tipoPago; }
+    public void setTipoPago(String tipoPago) { this.tipoPago = tipoPago != null ? tipoPago : "PESOS"; }
 }

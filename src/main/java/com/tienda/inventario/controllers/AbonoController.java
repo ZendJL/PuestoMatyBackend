@@ -78,19 +78,19 @@ public class AbonoController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta) {
         return abonoService.abonosEntreFechas(desde, hasta);
     }
-    
-    // ✅ NUEVO: Abonar + crear Abono (POST)
+
     @PostMapping("/{cuentaId}/abonar")
-    public ResponseEntity<Abono> abonarACuenta(@PathVariable Integer cuentaId, @RequestParam Float monto) {
-        Abono abono = abonoService.abonarACuenta(cuentaId, monto);
+    public ResponseEntity<Abono> abonarACuenta(
+            @PathVariable Integer cuentaId,
+            @RequestParam Float monto,
+            @RequestParam(defaultValue = "PESOS") String tipoPago) {
+        Abono abono = abonoService.abonarACuenta(cuentaId, monto, tipoPago);
         return ResponseEntity.ok(abono);
     }
 
-    // ✅ NUEVO: Recibo abono (GET)
     @GetMapping("/{abonoId}/recibo")
     public ResponseEntity<Map<String, Object>> obtenerReciboAbono(@PathVariable Integer abonoId) {
         Map<String, Object> recibo = abonoService.generarReciboAbono(abonoId);
         return ResponseEntity.ok(recibo);
     }
 }
-

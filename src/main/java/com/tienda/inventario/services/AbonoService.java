@@ -10,20 +10,13 @@ import com.tienda.inventario.entities.CuentaCliente;
 public interface AbonoService {
 
     Abono guardar(Abono abono);
-
     Abono buscarPorId(Integer id);
-
     List<Abono> listarTodos();
-
     void eliminar(Integer id);
-
     List<Abono> abonosDeCuenta(CuentaCliente cuenta);
-
     List<Abono> abonosDeCuentaEntreFechas(CuentaCliente cuenta, LocalDateTime desde, LocalDateTime hasta);
-
     List<Abono> abonosEntreFechas(LocalDateTime desde, LocalDateTime hasta);
-
-public Abono abonarACuenta(Integer cuentaId, Float monto);
-
-public Map<String, Object> generarReciboAbono(Integer abonoId);
+    Abono abonarACuenta(Integer cuentaId, Float monto);
+    Abono abonarACuenta(Integer cuentaId, Float monto, String tipoPago);
+    Map<String, Object> generarReciboAbono(Integer abonoId);
 }

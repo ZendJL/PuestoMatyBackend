@@ -23,15 +23,14 @@ public class AbonoServiceImpl implements AbonoService {
 
     public AbonoServiceImpl(AbonoRepository abonoRepository, CuentaClienteService cuentaClienteService) {
         this.abonoRepository = abonoRepository;
-        this.cuentaClienteService = null;
+        this.cuentaClienteService = cuentaClienteService;
     }
 
     @Override
     public Abono guardar(Abono abono) {
-            if (abono.getFecha() == null) {
-        abono.setFecha(LocalDateTime.now());
-    }
-
+        if (abono.getFecha() == null) {
+            abono.setFecha(LocalDateTime.now());
+        }
         return abonoRepository.save(abono);
     }
 
@@ -64,45 +63,54 @@ public class AbonoServiceImpl implements AbonoService {
     public List<Abono> abonosEntreFechas(LocalDateTime desde, LocalDateTime hasta) {
         return abonoRepository.findByFechaBetweenOrderByFechaDesc(desde, hasta);
     }
-    // ✅ En AbonoService / AbonoServiceImpl
-@Transactional
-public Abono abonarACuenta(Integer cuentaId, Float monto) {
-    CuentaCliente cuenta = cuentaClienteService.buscarPorId(cuentaId);
-    if (cuenta == null) {
-        throw new IllegalArgumentException("Cuenta no encontrada: " + cuentaId);
-    }
-    
-    Float saldoActual = cuenta.getSaldo() == null ? 0f : cuenta.getSaldo();
-    Float nuevoSaldo = saldoActual - monto;
-    
-    Abono abono = new Abono();
-    abono.setCuenta(cuenta);
-    abono.setCantidad((float) monto);
-    abono.setFecha(LocalDateTime.now());
-    abono.setViejoSaldo(saldoActual);
-    abono.setNuevoSaldo(nuevoSaldo);
-    
-    cuenta.setSaldo(nuevoSaldo);
-    cuentaClienteService.guardar(cuenta);
-    
-    return guardar(abono);
-}
 
-public Map<String, Object> generarReciboAbono(Integer abonoId) {
-    Abono abono = buscarPorId(abonoId);
-    if (abono == null) {
-        throw new IllegalArgumentException("Abono no encontrado");
+    @Override
+    @Transactional
+    public Abono abonarACuenta(Integer cuentaId, Float monto) {
+        return abonarACuenta(cuentaId, monto, "PESOS");
     }
-    
-    Map<String, Object> recibo = new HashMap<>();
-    recibo.put("abonoId", abono.getId());
-    recibo.put("fecha", abono.getFecha());
-    recibo.put("monto", abono.getCantidad());
-    recibo.put("saldoAnterior", abono.getViejoSaldo());
-    recibo.put("nuevoSaldo", abono.getNuevoSaldo());
-    recibo.put("nombreCliente", abono.getCuenta().getNombre());
-    
-    return recibo;
-}
 
+    @Override
+    @Transactional
+    public Abono abonarACuenta(Integer cuentaId, Float monto, String tipoPago) {
+        CuentaCliente cuenta = cuentaClienteService.buscarPorId(cuentaId);
+        if (cuenta == null) {
+            throw new IllegalArgumentException("Cuenta no encontrada: " + cuentaId);
+        }
+
+        Float saldoActual = cuenta.getSaldo() == null ? 0f : cuenta.getSaldo();
+        Float nuevoSaldo = saldoActual - monto;
+
+        Abono abono = new Abono();
+        abono.setCuenta(cuenta);
+        abono.setCantidad(monto);
+        abono.setFecha(LocalDateTime.now());
+        abono.setViejoSaldo(saldoActual);
+        abono.setNuevoSaldo(nuevoSaldo);
+        abono.setTipoPago(tipoPago != null ? tipoPago : "PESOS");
+
+        cuenta.setSaldo(nuevoSaldo);
+        cuentaClienteService.guardar(cuenta);
+
+        return guardar(abono);
+    }
+
+    @Override
+    public Map<String, Object> generarReciboAbono(Integer abonoId) {
+        Abono abono = buscarPorId(abonoId);
+        if (abono == null) {
+            throw new IllegalArgumentException("Abono no encontrado");
+        }
+
+        Map<String, Object> recibo = new HashMap<>();
+        recibo.put("abonoId", abono.getId());
+        recibo.put("fecha", abono.getFecha());
+        recibo.put("monto", abono.getCantidad());
+        recibo.put("saldoAnterior", abono.getViejoSaldo());
+        recibo.put("nuevoSaldo", abono.getNuevoSaldo());
+        recibo.put("nombreCliente", abono.getCuenta().getNombre());
+        recibo.put("tipoPago", abono.getTipoPago());
+
+        return recibo;
+    }
 }
