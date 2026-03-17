@@ -35,3 +35,4 @@ build/
 
 ### Configuración local ###
 src/main/resources/application.properties
+src/main/resources/application.properties
