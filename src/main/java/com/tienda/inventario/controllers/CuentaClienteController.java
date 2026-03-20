@@ -2,7 +2,6 @@ package com.tienda.inventario.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,10 +20,10 @@ import com.tienda.inventario.dto.CuentaClienteResumenDto;
 import com.tienda.inventario.dto.CuentaResumenDto;
 import com.tienda.inventario.entities.Abono;
 import com.tienda.inventario.entities.CuentaCliente;
-import com.tienda.inventario.entities.VentaCliente; // ✅ AGREGADO
+import com.tienda.inventario.entities.VentaCliente;
 import com.tienda.inventario.services.AbonoService;
 import com.tienda.inventario.services.CuentaClienteService;
-import com.tienda.inventario.services.VentaClienteService; // ✅ AGREGADO
+import com.tienda.inventario.services.VentaClienteService;
 import com.tienda.inventario.services.VentaService;
 
 import jakarta.persistence.EntityManager;
@@ -38,64 +37,41 @@ public class CuentaClienteController {
     private final VentaService ventaService;
     private final VentaClienteService ventaClienteService;
     private final CuentaClienteService cuentaClienteService;
-    private final AbonoService abonoService; // ✅ AGREGADO
+    private final AbonoService abonoService;
 
-    // ✅ CONSTRUCTOR CON AbonoService
     public CuentaClienteController(
             CuentaClienteService cuentaClienteService,
             VentaService ventaService,
             VentaClienteService ventaClienteService,
-            AbonoService abonoService) { // ✅ AGREGADO
+            AbonoService abonoService) {
         this.cuentaClienteService = cuentaClienteService;
         this.ventaService = ventaService;
         this.ventaClienteService = ventaClienteService;
-        this.abonoService = abonoService; // ✅ AGREGADO
+        this.abonoService = abonoService;
     }
 
-    // ✅ MÉTODO ABONAR CORREGIDO - AHORA SÍ GUARDA EN TABLA ABONOS
+    /**
+     * POST /api/cuentas/{id}/abonar?monto=XX&tipoPago=PESOS
+     * Retorna el objeto Abono guardado directamente (no un wrapper).
+     * El frontend puede leer: res.data.id, res.data.cantidad, res.data.viejoSaldo, res.data.nuevoSaldo, res.data.tipoPago
+     */
     @PostMapping("/{id}/abonar")
-    public ResponseEntity<Map<String, Object>> abonar(
+    public ResponseEntity<Abono> abonar(
             @PathVariable Integer id,
-            @RequestParam("monto") Float monto) {
-        
+            @RequestParam("monto") Float monto,
+            @RequestParam(value = "tipoPago", defaultValue = "PESOS") String tipoPago) {
+
         if (monto == null || monto <= 0f) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Monto inválido"));
+            return ResponseEntity.badRequest().build();
         }
 
         try {
-            // ✅ 1. Buscar cuenta
-            CuentaCliente cuenta = cuentaClienteService.buscarPorId(id);
-            if (cuenta == null) {
-                return ResponseEntity.notFound().build();
-            }
-            
-            // ✅ 2. Crear ABONO
-            Abono abono = new Abono();
-            abono.setCuenta(cuenta);
-            abono.setCantidad(monto);
-            abono.setViejoSaldo(cuenta.getSaldo() == null ? 0f : cuenta.getSaldo());
-            abono.setNuevoSaldo(abono.getViejoSaldo() - monto);
-            
-            // ✅ 3. GUARDAR ABONO EN TABLA ABONOS
-            abonoService.guardar(abono);
-            
-            // ✅ 4. Actualizar saldo cuenta
-            Float saldoActual = cuenta.getSaldo() == null ? 0f : cuenta.getSaldo();
-            Float nuevoSaldo = Math.max(0f, saldoActual - monto);
-            cuenta.setSaldo(nuevoSaldo);
-            cuentaClienteService.guardar(cuenta);
-            
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "abono", abono,
-                "nuevoSaldo", nuevoSaldo,
-                "mensaje", "Abono registrado correctamente"
-            ));
+            Abono abono = abonoService.abonarACuenta(id, monto, tipoPago);
+            return ResponseEntity.ok(abono);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "error", e.getMessage()
-            ));
+            return ResponseEntity.status(500).build();
         }
     }
 
@@ -153,14 +129,12 @@ public class CuentaClienteController {
 
     @GetMapping("/{id}/detalles")
     public ResponseEntity<?> detalles(@PathVariable Integer id) {
-        System.out.println("🔍 === DETALLES REQUEST ID=" + id + " ===");
+        System.out.println("\uD83D\uDD0D === DETALLES REQUEST ID=" + id + " ===");
         try {
-            System.out.println("✅ Service inyectado: " + (cuentaClienteService != null));
             CuentaClienteDetallesDto detalles = cuentaClienteService.getDetallesById(id.longValue());
-            System.out.println("✅ Detalles OK: " + detalles.getNombre());
             return ResponseEntity.ok(detalles);
         } catch (Exception e) {
-            System.err.println("❌ ERROR detalles ID=" + id + ":");
+            System.err.println("\u274C ERROR detalles ID=" + id);
             e.printStackTrace();
             return ResponseEntity.status(500).body("ERROR: " + e.getMessage());
         }
@@ -190,66 +164,60 @@ public class CuentaClienteController {
 
         return ResponseEntity.ok(resumen);
     }
-    
-   @RestController
-@RequestMapping("/api/cuentas")
-@CrossOrigin(origins = "http://localhost:5173")
-public class CuentaController {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @RestController
+    @RequestMapping("/api/cuentas")
+    @CrossOrigin(origins = "http://localhost:5173")
+    public class CuentaController {
 
-    @GetMapping("/optimizadas-pos")
-    public ResponseEntity<List<CuentaClienteDetallesDto>> getCuentasOptimizadasPos() {
-        try {
-            // ✅ 1 SOLA QUERY con todos los JOINs
-            String sql = """
-                SELECT 
-                    cc.id, cc.nombre, cc.descripcion, cc.saldo,
-                    COALESCE(SUM(a.cantidad), 0) as total_abonos,
-                    COALESCE(COUNT(vc.id), 0) as total_ventas,
-                    COALESCE(SUM(v.total), 0) as total_facturado,
-                    COALESCE(SUM(a.cantidad), 0) as total_pagado,
-                    COALESCE(cc.saldo, 0) as deuda_pendiente,
-                    NULL as abono_id, NULL as abono_fecha, NULL as abono_cantidad,  -- ultimosAbonos
-                    NULL as venta_id, NULL as venta_fecha, NULL as venta_total     -- ultimasVentas
-                FROM cuenta_cliente cc
-                LEFT JOIN abonos a ON a.cuenta_id = cc.id
-                LEFT JOIN ventas_cliente vc ON vc.cuenta_id = cc.id
-                LEFT JOIN ventas v ON v.id = vc.venta_id
-                GROUP BY cc.id, cc.nombre, cc.descripcion, cc.saldo
-                ORDER BY cc.nombre
-            """;
+        @PersistenceContext
+        private EntityManager entityManager;
 
-            List<Object[]> rows = entityManager.createNativeQuery(sql).getResultList();
-            
-            // ✅ Transformar a tu DTO (SIN listas detalladas para POS)
-            List<CuentaClienteDetallesDto> cuentas = new ArrayList<>();
-            
-            for (Object[] row : rows) {
-                CuentaClienteDetallesDto dto = new CuentaClienteDetallesDto(
-                    ((Number) row[0]).longValue(),           // id
-                    (String) row[1],                        // nombre
-                    (String) row[2],                        // descripcion
-                    ((Number) row[3]).floatValue(),         // saldo
-                    ((Number) row[4]).doubleValue(),        // totalAbonos
-                    ((Long) row[5]).intValue(),             // totalVentas
-                    ((Number) row[6]).doubleValue(),        // totalFacturado
-                    ((Number) row[7]).doubleValue(),        // totalPagado
-                    ((Number) row[8]).doubleValue(),        // deudaPendiente
-                    new ArrayList<>(),                      // ultimosAbonos (vacío)
-                    new ArrayList<>()                       // ultimasVentas (vacío)
-                );
-                cuentas.add(dto);
+        @GetMapping("/optimizadas-pos")
+        public ResponseEntity<List<CuentaClienteDetallesDto>> getCuentasOptimizadasPos() {
+            try {
+                String sql = """
+                    SELECT 
+                        cc.id, cc.nombre, cc.descripcion, cc.saldo,
+                        COALESCE(SUM(a.cantidad), 0) as total_abonos,
+                        COALESCE(COUNT(vc.id), 0) as total_ventas,
+                        COALESCE(SUM(v.total), 0) as total_facturado,
+                        COALESCE(SUM(a.cantidad), 0) as total_pagado,
+                        COALESCE(cc.saldo, 0) as deuda_pendiente
+                    FROM cuenta_cliente cc
+                    LEFT JOIN abonos a ON a.cuenta_id = cc.id
+                    LEFT JOIN ventas_cliente vc ON vc.cuenta_id = cc.id
+                    LEFT JOIN ventas v ON v.id = vc.venta_id
+                    GROUP BY cc.id, cc.nombre, cc.descripcion, cc.saldo
+                    ORDER BY cc.nombre
+                """;
+
+                List<Object[]> rows = entityManager.createNativeQuery(sql).getResultList();
+                List<CuentaClienteDetallesDto> cuentas = new ArrayList<>();
+
+                for (Object[] row : rows) {
+                    CuentaClienteDetallesDto dto = new CuentaClienteDetallesDto(
+                        ((Number) row[0]).longValue(),
+                        (String) row[1],
+                        (String) row[2],
+                        ((Number) row[3]).floatValue(),
+                        ((Number) row[4]).doubleValue(),
+                        ((Long) row[5]).intValue(),
+                        ((Number) row[6]).doubleValue(),
+                        ((Number) row[7]).doubleValue(),
+                        ((Number) row[8]).doubleValue(),
+                        new ArrayList<>(),
+                        new ArrayList<>()
+                    );
+                    cuentas.add(dto);
+                }
+
+                return ResponseEntity.ok(cuentas);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body(new ArrayList<>());
             }
-            
-            return ResponseEntity.ok(cuentas);
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(new ArrayList<>());
         }
     }
-}
-
 }
